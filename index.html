@@ -1,82 +1,158 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Jabalises Bikers</title>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
-  margin:0;
-  background:#111827;
-  color:white;
-  font-family:Arial;
-  padding:30px;
+margin:0;
+background:#111827;
+color:white;
+font-family:Arial;
+padding:30px;
 }
+
 .card{
-  background:#1f2937;
-  padding:30px;
-  border-radius:20px;
-  max-width:500px;
-  margin:auto;
-  text-align:center;
+background:#1f2937;
+padding:30px;
+border-radius:20px;
+max-width:500px;
+margin:auto;
+text-align:center;
 }
-h1{color:#22c55e}
-input,button{
-  width:90%;
-  padding:14px;
-  margin:8px;
-  border-radius:10px;
-  border:0;
+
+h1{
+color:#22c55e;
 }
+
+input,
 button{
-  background:#22c55e;
-  font-weight:bold;
-  cursor:pointer;
+width:90%;
+padding:14px;
+margin:8px;
+border-radius:10px;
+border:0;
 }
-.small{color:#9ca3af}
+
+button{
+background:#22c55e;
+font-weight:bold;
+cursor:pointer;
+}
+
+.small{
+color:#9ca3af;
+}
+
 </style>
+
 </head>
 
 <body>
+
 <div class="card">
-  <h1>🏔️ Jabalises Bikers</h1>
-  <p>Ranking automático de la grupeta</p>
 
-  <h3>Entrar</h3>
+<h1>🏔️ Jabalises Bikers</h1>
 
-  <input id="email" type="email" placeholder="Tu email">
-  <input id="password" type="password" placeholder="Tu contraseña">
+<p>Ranking automático de la grupeta</p>
 
-  <button onclick="login()">Entrar</button>
+<h3>Entrar</h3>
 
-  <p id="msg" class="small">Conectando con Supabase...</p>
+<input
+id="email"
+type="email"
+placeholder="Tu email">
+
+<input
+id="password"
+type="password"
+placeholder="Tu contraseña">
+
+<button onclick="login()">
+Entrar
+</button>
+
+<p
+id="msg"
+class="small">
+App lista ✅
+</p>
+
+<button onclick="connectStrava()">
+🚴 Conectar Strava
+</button>
+
 </div>
 
 <script>
-const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
-const SUPABASE_KEY = "sb_publishable_bEvn9tUCIgXCwoLb9nNWyg_SXOXuT-k";
 
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+"https://bktwylokqyjuoernembh.supabase.co";
 
-document.getElementById("msg").innerText = "App lista ✅";
+const SUPABASE_KEY =
+"sb_publishable_bEvn9tUCIgXCwoLb9nNWyg_SXOXuT-k";
+
+const supabaseClient =
+supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
 
 async function login(){
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: email,
-    password: password
-  });
+const email =
+document.getElementById(
+"email"
+).value;
 
-  if(error){
-    document.getElementById("msg").innerText = "Error: " + error.message;
-  } else {
-    document.getElementById("msg").innerText = "Bienvenido a Jabalises Bikers 🚵";
-  }
+const password =
+document.getElementById(
+"password"
+).value;
+
+const { error } =
+await supabaseClient.auth.signInWithPassword({
+
+email,
+password
+
+});
+
+if(error){
+
+document.getElementById(
+"msg"
+).innerText =
+"❌ " + error.message;
+
+return;
+
 }
+
+document.getElementById(
+"msg"
+).innerText =
+"Bienvenido a Jabalises Bikers 🚵";
+
+}
+
+function connectStrava(){
+
+alert(
+"Próximo paso: conectar con Strava 🔗"
+);
+
+}
+
 </script>
+
 </body>
+
 </html>
