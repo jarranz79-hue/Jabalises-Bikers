@@ -1,172 +1,278 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jabalises Bikers</title>
+
+<meta name="viewport"
+content="width=device-width,initial-scale=1">
+
+<title>
+Jabalises Bikers
+</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
-  background:#111827;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-  padding:30px;
+background:#111827;
+color:white;
+font-family:Arial;
+padding:30px;
+text-align:center;
 }
+
 .card{
-  background:#1f2937;
-  padding:25px;
-  border-radius:18px;
-  max-width:800px;
-  margin:auto;
+background:#1f2937;
+max-width:900px;
+margin:auto;
+padding:25px;
+border-radius:18px;
 }
+
 button{
-  padding:14px;
-  border:0;
-  border-radius:10px;
-  background:#fc4c02;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
+padding:14px;
+border-radius:10px;
+border:0;
+background:#fc4c02;
+color:white;
+cursor:pointer;
+font-weight:bold;
 }
-.summary{
-  background:#065f46;
-  margin:20px 0;
-  padding:18px;
-  border-radius:14px;
+
+.box{
+background:#374151;
+padding:18px;
+margin:12px;
+border-radius:12px;
 }
-.activity{
-  background:#374151;
-  margin:12px 0;
-  padding:15px;
-  border-radius:12px;
-  text-align:left;
-}
+
 .points{
-  color:#22c55e;
-  font-weight:bold;
-  font-size:20px;
+font-size:40px;
+color:#22c55e;
+font-weight:bold;
 }
+
 .small{
-  color:#9ca3af;
+color:#9ca3af;
 }
+
+.grid{
+display:grid;
+grid-template-columns:
+repeat(
+auto-fit,
+minmax(
+180px,
+1fr
+)
+);
+
+gap:10px;
+
+}
+
 </style>
+
 </head>
 
 <body>
 
 <div class="card">
-<h1>🏔️ Jabalises Bikers</h1>
-<p>Ranking automático</p>
 
-<button onclick="connectStrava()">🚴 Conectar Strava</button>
+<h1>
+🏔️ Jabalises Bikers
+</h1>
 
-<p id="msg" class="small">Preparado</p>
+<p>
+Ranking semanal
+</p>
 
-<div id="summary"></div>
-<div id="activities"></div>
+<button
+onclick="loadRanking()">
+
+🏆 Actualizar ranking
+
+</button>
+
+<p
+id="msg"
+class="small">
+
+Preparado
+
+</p>
+
+<div
+id="ranking">
+
+</div>
+
 </div>
 
 <script>
-const STRAVA_CLIENT_ID = "250583";
-const REDIRECT = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
 
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
-const FUNCTION_URL = "https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
+const SUPABASE_URL =
+"https://bktwylokqyjuoernembh.supabase.co";
 
-const params = new URLSearchParams(window.location.search);
-const code = params.get("code");
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
+";
 
-if(code){
-  document.getElementById("msg").innerText =
-  "🎟️ Código recibido. Calculando puntos...";
-  loadActivities(code);
+const supabase =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+async function loadRanking(){
+
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"Cargando ranking...";
+
+const {
+data,
+error
+}
+=
+await supabase
+
+.from(
+"weekly_ranking"
+)
+
+.select(
+"*"
+)
+
+.limit(
+1
+);
+
+if(error){
+
+document
+.getElementById(
+"msg"
+)
+.innerText =
+error.message;
+
+return;
+
 }
 
-function connectStrava(){
-  const url =
-  "https://www.strava.com/oauth/authorize" +
-  "?client_id=" + STRAVA_CLIENT_ID +
-  "&response_type=code" +
-  "&redirect_uri=" + encodeURIComponent(REDIRECT) +
-  "&approval_prompt=force" +
-  "&scope=read,activity:read_all";
+if(
+!data.length
+){
 
-  window.location.href = url;
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"No hay datos";
+
+return;
+
 }
 
-async function loadActivities(code){
-  try{
-    const response = await fetch(FUNCTION_URL,{
-      method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "apikey":SUPABASE_KEY,
-        "Authorization":"Bearer " + SUPABASE_KEY
-      },
-      body:JSON.stringify({code:code})
-    });
+const r =
+data[0];
 
-    const data = await response.json();
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"Ranking actualizado";
 
-    if(!data.ok){
-      document.getElementById("msg").innerText =
-      "❌ " + JSON.stringify(data);
-      return;
-    }
+document
+.getElementById(
+"ranking"
+)
+.innerHTML =
 
-    document.getElementById("msg").innerText =
-    "✅ Actividades cargadas y puntuadas";
+`
 
-    const actividades = data.actividades;
+<div class="box">
 
-    let totalKm = 0;
-    let totalDesnivel = 0;
-    let totalMinutos = 0;
-    let totalPuntos = 0;
+<h2>
 
-    actividades.forEach((act)=>{
-      totalKm += Number(act.km);
-      totalDesnivel += Number(act.desnivel);
-      totalMinutos += Number(act.minutos);
-      totalPuntos += Number(act.puntos);
-    });
+🏆 Semana ${r.week}
 
-    document.getElementById("summary").innerHTML =
-    `<div class="summary">
-      <h2>🏆 Resumen</h2>
-      <p><strong>${actividades.length}</strong> actividades</p>
-      <p><strong>${totalKm.toFixed(1)}</strong> km</p>
-      <p><strong>${Math.round(totalDesnivel)}</strong> m+</p>
-      <p><strong>${Math.round(totalMinutos)}</strong> min</p>
-      <p class="points">${Math.round(totalPuntos)} puntos</p>
-    </div>`;
+</h2>
 
-    const container = document.getElementById("activities");
-    container.innerHTML = "";
+<div class="points">
 
-    actividades.forEach((act)=>{
-      const div = document.createElement("div");
-      div.className = "activity";
+${r.total_points}
 
-      div.innerHTML =
-      "<strong>" + act.nombre + "</strong><br>" +
-      "Tipo: " + act.tipo + "<br>" +
-      "Fecha: " + new Date(act.fecha).toLocaleDateString("es-ES") + "<br>" +
-      "Km: " + act.km + "<br>" +
-      "Desnivel: " + act.desnivel + " m<br>" +
-      "Tiempo: " + act.minutos + " min<br>" +
-      "<span class='points'>🏆 " + act.puntos + " puntos</span>";
+</div>
 
-      container.appendChild(div);
-    });
+<p>
 
-  }catch(error){
-    document.getElementById("msg").innerText =
-    "❌ Error conectando";
-  }
+puntos
+
+</p>
+
+</div>
+
+<div class="grid">
+
+<div class="box">
+
+🚴
+
+<br>
+
+${r.activities}
+
+<br>
+
+salidas
+
+</div>
+
+<div class="box">
+
+📍
+
+<br>
+
+${r.total_km}
+
+km
+
+</div>
+
+<div class="box">
+
+⛰️
+
+<br>
+
+${r.total_elevation}
+
+m+
+
+</div>
+
+</div>
+
+`;
+
 }
+
+loadRanking();
+
 </script>
 
 </body>
+
 </html>
