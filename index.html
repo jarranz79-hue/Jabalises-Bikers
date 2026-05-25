@@ -4,9 +4,7 @@
 <head>
 
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
 <title>Jabalises Bikers</title>
 
@@ -59,6 +57,11 @@ background:#fc4c02;
 color:#9ca3af;
 }
 
+.success{
+color:#22c55e;
+font-size:18px;
+}
+
 </style>
 
 </head>
@@ -67,13 +70,9 @@ color:#9ca3af;
 
 <div class="card">
 
-<h1>
-🏔️ Jabalises Bikers
-</h1>
+<h1>🏔️ Jabalises Bikers</h1>
 
-<p>
-Ranking automático
-</p>
+<p>Ranking automático</p>
 
 <input
 id="email"
@@ -85,11 +84,8 @@ id="password"
 type="password"
 placeholder="Contraseña">
 
-<button
-onclick="login()">
-
+<button onclick="login()">
 Entrar
-
 </button>
 
 <button
@@ -130,17 +126,42 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const code =
+params.get(
+"code"
+);
+
+if(code){
+
+document
+.getElementById(
+"msg"
+)
+.innerHTML =
+"✅ Strava conectada";
+
+}
+
 async function login(){
 
 const email =
-document.getElementById(
+document
+.getElementById(
 "email"
-).value;
+)
+.value;
 
 const password =
-document.getElementById(
+document
+.getElementById(
 "password"
-).value;
+)
+.value;
 
 const { error } =
 await supabaseClient
