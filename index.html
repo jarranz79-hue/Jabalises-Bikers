@@ -1,29 +1,43 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<title>Jabalises Bikers</title>
+<title>
+Jabalises Bikers
+</title>
 
 <style>
 
 body{
+
 background:#111827;
+
 color:white;
+
 font-family:Arial;
-padding:30px;
+
 text-align:center;
+
+padding:50px;
+
 }
 
 button{
-padding:14px;
-border-radius:10px;
+
+padding:15px;
+
 border:0;
-background:#fc4c02;
+
+border-radius:10px;
+
+background:#22c55e;
+
 color:white;
+
 cursor:pointer;
+
 }
 
 </style>
@@ -33,63 +47,91 @@ cursor:pointer;
 <body>
 
 <h1>
+
 🏔️ Jabalises Bikers
+
 </h1>
 
 <p id="msg">
-App iniciando...
+
+Preparado
+
 </p>
 
 <button
-onclick="connectStrava()">
+onclick="testFunction()">
 
-🚴 Conectar Strava
+Probar función
 
 </button>
 
 <script>
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"App lista ✅";
+const FUNCTION_URL =
+"https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
 
-const STRAVA_CLIENT_ID =
-"250583";
-
-const REDIRECT =
-"https://jarranz79-hue.github.io/Jabalises-Bikers/";
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-const code =
-params.get(
-"code"
-);
-
-if(code){
+async function testFunction(){
 
 document
 .getElementById(
 "msg"
 )
 .innerText =
-"🎉 Código recibido";
+"Probando...";
+
+try{
+
+const response =
+await fetch(
+FUNCTION_URL,
+{
+
+method:
+"POST",
+
+headers:{
+"Content-Type":
+"application/json"
+},
+
+body:
+JSON.stringify({
+
+code:
+"prueba"
+
+})
 
 }
 
-function connectStrava(){
+);
 
-const url =
-`https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT)}&approval_prompt=force&scope=read,activity:read_all`;
+const data =
+await response.json();
 
-window.location =
-url;
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"✅ Función responde";
+
+console.log(
+data
+);
+
+}
+
+catch(e){
+
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"❌ Error función";
+
+}
 
 }
 
