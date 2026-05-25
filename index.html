@@ -1,142 +1,107 @@
 <!DOCTYPE html>
 <html>
-
 <head>
 <meta charset="UTF-8">
-
-<title>
-Jabalises Bikers
-</title>
-
+<title>Jabalises Bikers</title>
 <style>
-
 body{
-
 background:#111827;
-
 color:white;
-
 font-family:Arial;
-
 text-align:center;
-
 padding:50px;
-
 }
-
 button{
-
 padding:15px;
-
 border:0;
-
 border-radius:10px;
-
-background:#22c55e;
-
+background:#fc4c02;
 color:white;
-
 cursor:pointer;
-
 }
-
 </style>
-
 </head>
 
 <body>
 
-<h1>
+<h1>🏔️ Jabalises Bikers</h1>
 
-🏔️ Jabalises Bikers
+<p id="msg">Preparado</p>
 
-</h1>
-
-<p id="msg">
-
-Preparado
-
-</p>
-
-<button
-onclick="testFunction()">
-
-Probar función
-
+<button onclick="connectStrava()">
+🚴 Conectar Strava
 </button>
 
 <script>
+const STRAVA_CLIENT_ID = "250583";
+
+const REDIRECT =
+"https://jarranz79-hue.github.io/Jabalises-Bikers/";
 
 const FUNCTION_URL =
 "https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
 
-async function testFunction(){
+const params =
+new URLSearchParams(window.location.search);
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"Probando...";
+const code =
+params.get("code");
+
+if(code){
+document.getElementById("msg").innerText =
+"🎟️ Código recibido. Pidiendo token...";
+
+exchangeCode(code);
+}
+
+function connectStrava(){
+
+const url =
+"https://www.strava.com/oauth/authorize" +
+"?client_id=" + STRAVA_CLIENT_ID +
+"&response_type=code" +
+"&redirect_uri=" + encodeURIComponent(REDIRECT) +
+"&approval_prompt=force" +
+"&scope=read,activity:read_all";
+
+window.location.href = url;
+}
+
+async function exchangeCode(code){
 
 try{
 
 const response =
-await fetch(
-FUNCTION_URL,
-{
-
-method:
-"POST",
-
+await fetch(FUNCTION_URL,{
+method:"POST",
 headers:{
-"Content-Type":
-"application/json"
+"Content-Type":"application/json"
 },
-
-body:
-JSON.stringify({
-
-code:
-"prueba"
-
+body:JSON.stringify({
+code:code
 })
-
-}
-
-);
+});
 
 const data =
 await response.json();
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"✅ Función responde";
-
-console.log(
-data
-);
-
+if(data.access_token){
+document.getElementById("msg").innerText =
+"✅ Token Strava recibido";
+}else{
+document.getElementById("msg").innerText =
+"❌ Strava no dio token";
 }
 
-catch(e){
+}catch(error){
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"❌ Error función";
+document.getElementById("msg").innerText =
+"❌ Error llamando a función";
 
 }
 
 }
-
 </script>
 
 </body>
-
 </html>
