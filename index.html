@@ -96,11 +96,10 @@ async function loadActivities(code){
     const data = await response.json();
 
     if(!data.ok){
-      document.getElementById("msg").innerText =
-      "❌ Error leyendo Strava";
-      console.log(data);
-      return;
-    }
+  document.getElementById("msg").innerText =
+  "❌ " + JSON.stringify(data);
+  return;
+}
 
     document.getElementById("msg").innerText =
     "✅ Actividades cargadas";
