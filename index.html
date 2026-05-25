@@ -1,125 +1,132 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
 
 <style>
 body{
-background:#111827;
-color:white;
-font-family:Arial;
-text-align:center;
-padding:50px;
+  background:#111827;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+  padding:30px;
 }
-
+.card{
+  background:#1f2937;
+  padding:25px;
+  border-radius:18px;
+  max-width:700px;
+  margin:auto;
+}
 button{
-padding:15px;
-border:0;
-border-radius:10px;
-background:#fc4c02;
-color:white;
-cursor:pointer;
+  padding:14px;
+  border:0;
+  border-radius:10px;
+  background:#fc4c02;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
 }
-
-#msg{
-margin-top:20px;
+.activity{
+  background:#374151;
+  margin:12px 0;
+  padding:15px;
+  border-radius:12px;
+  text-align:left;
 }
+.small{color:#9ca3af}
 </style>
 </head>
 
 <body>
 
+<div class="card">
 <h1>🏔️ Jabalises Bikers</h1>
+<p>Actividades reales de Strava</p>
 
-<p id="msg">Preparado</p>
+<button onclick="connectStrava()">🚴 Conectar Strava</button>
 
-<button onclick="connectStrava()">
-🚴 Conectar Strava
-</button>
+<p id="msg" class="small">Preparado</p>
+
+<div id="activities"></div>
+</div>
 
 <script>
 const STRAVA_CLIENT_ID = "250583";
+const REDIRECT = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
 
-const REDIRECT =
-"https://jarranz79-hue.github.io/Jabalises-Bikers/";
+const SUPABASE_KEY = "sb_publishable_bEvn9tUCIgXCwoLb9nNWyg_SXOXuT-k";
+const FUNCTION_URL = "https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
 
-const FUNCTION_URL =
-"https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
-
-const params =
-new URLSearchParams(window.location.search);
-
-const code =
-params.get("code");
+const params = new URLSearchParams(window.location.search);
+const code = params.get("code");
 
 if(code){
-document.getElementById("msg").innerText =
-"🎟️ Código recibido. Pidiendo token...";
-
-exchangeCode(code);
+  document.getElementById("msg").innerText =
+  "🎟️ Código recibido. Buscando actividades...";
+  loadActivities(code);
 }
 
 function connectStrava(){
+  const url =
+  "https://www.strava.com/oauth/authorize" +
+  "?client_id=" + STRAVA_CLIENT_ID +
+  "&response_type=code" +
+  "&redirect_uri=" + encodeURIComponent(REDIRECT) +
+  "&approval_prompt=force" +
+  "&scope=read,activity:read_all";
 
-const url =
-"https://www.strava.com/oauth/authorize" +
-"?client_id=" + STRAVA_CLIENT_ID +
-"&response_type=code" +
-"&redirect_uri=" + encodeURIComponent(REDIRECT) +
-"&approval_prompt=force" +
-"&scope=read,activity:read_all";
-
-window.location.href = url;
+  window.location.href = url;
 }
 
-async function exchangeCode(code){
+async function loadActivities(code){
+  try{
+    const response = await fetch(FUNCTION_URL,{
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey":SUPABASE_KEY,
+        "Authorization":"Bearer " + SUPABASE_KEY
+      },
+      body:JSON.stringify({code:code})
+    });
 
-try{
+    const data = await response.json();
 
-const response =
-await fetch(
-FUNCTION_URL,
-{
-method:"POST",
+    if(!data.ok){
+      document.getElementById("msg").innerText =
+      "❌ Error leyendo Strava";
+      console.log(data);
+      return;
+    }
 
-headers:{
-"Content-Type":"application/json",
-"apikey": SUPABASE_KEY,
-"Authorization": "Bearer " + SUPABASE_KEY
-},
+    document.getElementById("msg").innerText =
+    "✅ Actividades cargadas";
 
-body:JSON.stringify({
-code:code
-})
-}
-);
+    const container = document.getElementById("activities");
+    container.innerHTML = "";
 
-const data =
-await response.json();
+    data.actividades.forEach((act)=>{
+      const div = document.createElement("div");
+      div.className = "activity";
 
-if(data.access_token){
+      div.innerHTML =
+      "<strong>" + act.nombre + "</strong><br>" +
+      "Tipo: " + act.tipo + "<br>" +
+      "Fecha: " + new Date(act.fecha).toLocaleDateString("es-ES") + "<br>" +
+      "Km: " + act.km + "<br>" +
+      "Desnivel: " + act.desnivel + " m<br>" +
+      "Tiempo: " + act.minutos + " min";
 
-document.getElementById("msg").innerText =
-"✅ Token Strava recibido";
+      container.appendChild(div);
+    });
 
-}else{
-
-document.getElementById("msg").innerText =
-"❌ " + JSON.stringify(data);
-
-}
-
-}catch(error){
-
-document.getElementById("msg").innerText =
-"❌ Error llamando a función";
-
-}
-
+  }catch(error){
+    document.getElementById("msg").innerText =
+    "❌ Error conectando";
+  }
 }
 </script>
 
