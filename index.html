@@ -1,33 +1,100 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
+
 <head>
 <meta charset="UTF-8">
-<title>Jabalises Bikers</title>
-</head>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<body
-style="
+<title>Jabalises Bikers</title>
+
+<style>
+
+body{
 background:#111827;
 color:white;
 font-family:Arial;
+padding:30px;
 text-align:center;
-padding:50px;
-">
+}
 
-<h1>🏔️ Jabalises Bikers</h1>
+button{
+padding:14px;
+border-radius:10px;
+border:0;
+background:#fc4c02;
+color:white;
+cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>
+🏔️ Jabalises Bikers
+</h1>
 
 <p id="msg">
-Cargando...
+App iniciando...
 </p>
+
+<button
+onclick="connectStrava()">
+
+🚴 Conectar Strava
+
+</button>
 
 <script>
 
-document.getElementById(
+document
+.getElementById(
 "msg"
-).innerText =
-"✅ JavaScript funciona";
+)
+.innerText =
+"App lista ✅";
+
+const STRAVA_CLIENT_ID =
+"250583";
+
+const REDIRECT =
+"https://jarranz79-hue.github.io/Jabalises-Bikers/";
+
+const params =
+new URLSearchParams(
+window.location.search
+);
+
+const code =
+params.get(
+"code"
+);
+
+if(code){
+
+document
+.getElementById(
+"msg"
+)
+.innerText =
+"🎉 Código recibido";
+
+}
+
+function connectStrava(){
+
+const url =
+`https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT)}&approval_prompt=force&scope=read,activity:read_all`;
+
+window.location =
+url;
+
+}
 
 </script>
 
 </body>
+
 </html>
