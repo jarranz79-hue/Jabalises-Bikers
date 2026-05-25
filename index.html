@@ -90,7 +90,7 @@ document.getElementById("msg").innerText =
 "✅ Token Strava recibido";
 }else{
 document.getElementById("msg").innerText =
-"❌ Strava no dio token";
+"❌ " + JSON.stringify(data);
 }
 
 }catch(error){
