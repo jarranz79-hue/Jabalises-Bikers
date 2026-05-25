@@ -1,212 +1,100 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Jabalises Bikers</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-body{
-margin:0;
-background:#111827;
-color:white;
-font-family:Arial;
-padding:30px;
-}
-
-.card{
-background:#1f2937;
-padding:30px;
-border-radius:20px;
-max-width:500px;
-margin:auto;
-text-align:center;
-}
-
-h1{
-color:#22c55e;
-}
-
-input,
-button{
-width:90%;
-padding:14px;
-margin:8px;
-border-radius:10px;
-border:0;
-}
-
-button{
-background:#22c55e;
-color:white;
-font-weight:bold;
-cursor:pointer;
-}
-
-.strava{
-background:#fc4c02;
-}
-
-.small{
-color:#9ca3af;
-}
-
-.success{
-color:#22c55e;
-font-size:18px;
-}
-
+body{margin:0;background:#111827;color:white;font-family:Arial;padding:30px}
+.card{background:#1f2937;padding:30px;border-radius:20px;max-width:500px;margin:auto;text-align:center}
+h1{color:#22c55e}
+input,button{width:90%;padding:14px;margin:8px;border-radius:10px;border:0}
+button{background:#22c55e;color:white;font-weight:bold;cursor:pointer}
+.strava{background:#fc4c02}
+.small{color:#9ca3af}
 </style>
-
 </head>
 
 <body>
-
 <div class="card">
-
 <h1>🏔️ Jabalises Bikers</h1>
-
 <p>Ranking automático</p>
 
-<input
-id="email"
-type="email"
-placeholder="Email">
+<input id="email" type="email" placeholder="Email">
+<input id="password" type="password" placeholder="Contraseña">
 
-<input
-id="password"
-type="password"
-placeholder="Contraseña">
+<button onclick="login()">Entrar</button>
+<button class="strava" onclick="connectStrava()">🚴 Conectar Strava</button>
 
-<button onclick="login()">
-Entrar
-</button>
-
-<button
-class="strava"
-onclick="connectStrava()">
-
-🚴 Conectar Strava
-
-</button>
-
-<p
-id="msg"
-class="small">
-
-Listo ✅
-
-</p>
-
+<p id="msg" class="small">Listo ✅</p>
 </div>
 
 <script>
+const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_KEY = "sb_publishable_bEvn9tUCIgXCwoLb9nNWyg_SXOXuT-k
+";
 
-const SUPABASE_URL =
-"https://bktwylokqyjuoernembh.supabase.co";
+const STRAVA_CLIENT_ID = "250583";
+const REDIRECT = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
+const FUNCTION_URL = "https://bktwylokqyjuoernembh.supabase.co/functions/v1/strava-auth";
 
-const SUPABASE_KEY =
-"sb_publishable_bEvn9tUCIgXCwoLb9nNWyg_SXOXuT-k";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const STRAVA_CLIENT_ID =
-"250583";
-
-const REDIRECT =
-"https://jarranz79-hue.github.io/Jabalises-Bikers/";
-
-const supabaseClient =
-supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-const params =
-new URLSearchParams(
-window.location.search
-);
-
-const code =
-params.get(
-"code"
-);
+const params = new URLSearchParams(window.location.search);
+const code = params.get("code");
 
 if(code){
-
-document
-.getElementById(
-"msg"
-)
-.innerHTML =
-"✅ Strava conectada";
-
+  document.getElementById("msg").innerText = "Conectando Strava...";
+  exchangeStravaCode(code);
 }
 
 async function login(){
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-const email =
-document
-.getElementById(
-"email"
-)
-.value;
+  const { error } = await supabaseClient.auth.signInWithPassword({
+    email,
+    password
+  });
 
-const password =
-document
-.getElementById(
-"password"
-)
-.value;
+  if(error){
+    document.getElementById("msg").innerText = "❌ " + error.message;
+    return;
+  }
 
-const { error } =
-await supabaseClient
-.auth
-.signInWithPassword({
-
-email,
-password
-
-});
-
-if(error){
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-error.message;
-
-return;
-
-}
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"Bienvenido 🚵";
-
+  document.getElementById("msg").innerText = "Bienvenido 🚵";
 }
 
 function connectStrava(){
+  const url =
+  `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT)}&approval_prompt=auto&scope=read,activity:read_all`;
 
-const url =
-`https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT)}&approval_prompt=auto&scope=read,activity:read_all`;
-
-window.location =
-url;
-
+  window.location = url;
 }
 
+async function exchangeStravaCode(code){
+  const response = await fetch(FUNCTION_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      code: code
+    })
+  });
+
+  const data = await response.json();
+
+  if(data.access_token){
+    document.getElementById("msg").innerText =
+    "✅ Strava conectada de verdad";
+  } else {
+    document.getElementById("msg").innerText =
+    "❌ Error conectando Strava";
+  }
+}
 </script>
-
 </body>
-
 </html>
