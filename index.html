@@ -28,7 +28,7 @@ button{background:#22c55e;color:white;font-weight:bold;cursor:pointer}
 <button onclick="login()">Entrar</button>
 <button class="strava" onclick="connectStrava()">🚴 Conectar Strava</button>
 
-<p id="msg" class="small">Listo ✅</p>
+<p id="msg" class="small">Cargando app...</p>
 </div>
 
 <script>
@@ -42,11 +42,13 @@ const FUNCTION_URL = "https://bktwylokqyjuoernembh.supabase.co/functions/v1/stra
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+document.getElementById("msg").innerText = "App lista ✅";
+
 const params = new URLSearchParams(window.location.search);
 const code = params.get("code");
 
 if(code){
-  document.getElementById("msg").innerText = "Conectando Strava...";
+  document.getElementById("msg").innerText = "🎟️ Código de Strava detectado. Conectando...";
   exchangeStravaCode(code);
 }
 
@@ -55,8 +57,8 @@ async function login(){
   const password = document.getElementById("password").value;
 
   const { error } = await supabaseClient.auth.signInWithPassword({
-    email,
-    password
+    email: email,
+    password: password
   });
 
   if(error){
@@ -69,30 +71,41 @@ async function login(){
 
 function connectStrava(){
   const url =
-  `https://www.strava.com/oauth/authorize?client_id=${STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(REDIRECT)}&approval_prompt=auto&scope=read,activity:read_all`;
+  "https://www.strava.com/oauth/authorize" +
+  "?client_id=" + STRAVA_CLIENT_ID +
+  "&response_type=code" +
+  "&redirect_uri=" + encodeURIComponent(REDIRECT) +
+  "&approval_prompt=force" +
+  "&scope=read,activity:read_all";
 
-  window.location = url;
+  window.location.href = url;
 }
 
 async function exchangeStravaCode(code){
-  const response = await fetch(FUNCTION_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      code: code
-    })
-  });
+  try{
+    const response = await fetch(FUNCTION_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        code: code
+      })
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if(data.access_token){
+    if(data.access_token){
+      document.getElementById("msg").innerText =
+      "✅ Strava conectada de verdad";
+    }else{
+      document.getElementById("msg").innerText =
+      "❌ Strava respondió, pero sin token";
+    }
+
+  }catch(error){
     document.getElementById("msg").innerText =
-    "✅ Strava conectada de verdad";
-  } else {
-    document.getElementById("msg").innerText =
-    "❌ Error conectando Strava";
+    "❌ Error llamando a la función";
   }
 }
 </script>
