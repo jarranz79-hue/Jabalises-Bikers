@@ -20,15 +20,15 @@ body{margin:0;background:#07111f;color:#f8fafc;font-family:Arial}
 .top{display:flex;justify-content:space-between;align-items:center}
 button{padding:14px 18px;border:0;border-radius:12px;background:#f97316;color:white;cursor:pointer;font-weight:bold}
 .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0}
-.card{background:#111827;padding:24px;border-radius:18px}
+.card,.panel{background:#111827;padding:22px;border-radius:18px}
 .value{font-size:36px;font-weight:bold;margin-top:10px}
-.green{color:#22c55e}
-.orange{color:#f97316}
-.gold{color:#facc15}
-.silver{color:#cbd5e1}
-.bronze{color:#fb923c}
+.green{color:#22c55e}.orange{color:#f97316}.gold{color:#facc15}.silver{color:#cbd5e1}.bronze{color:#fb923c}
 .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.panel{background:#111827;padding:22px;border-radius:18px}
+.podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;align-items:end;margin-bottom:20px}
+.podium-card{background:#111827;border:1px solid #1f2937;border-radius:22px;padding:20px;text-align:center}
+.podium-card.first{border:2px solid #facc15;box-shadow:0 0 25px rgba(250,204,21,.25);transform:scale(1.05)}
+.avatar{width:64px;height:64px;border-radius:50%;background:#f97316;margin:12px auto;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold}
+.title{font-weight:bold;margin:8px 0}
 table{width:100%;border-collapse:collapse}
 td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 .rank{width:34px;height:34px;background:#facc15;color:black;display:inline-flex;justify-content:center;align-items:center;border-radius:50%;font-weight:bold}
@@ -39,7 +39,8 @@ td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 .app{grid-template-columns:1fr}
 .sidebar{display:none}
 .cards{grid-template-columns:1fr 1fr}
-.grid{grid-template-columns:1fr}
+.grid,.podium{grid-template-columns:1fr}
+.podium-card.first{transform:none}
 }
 </style>
 </head>
@@ -74,25 +75,25 @@ td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 <p id="msg" class="small">Cargando...</p>
 
 <div class="cards">
-<div class="card">🏆<div id="points" class="value green">0</div></div>
-<div class="card">🚴<div id="activities" class="value">0</div></div>
-<div class="card">📍<div id="km" class="value">0</div></div>
-<div class="card">⛰️<div id="elevation" class="value orange">0</div></div>
+<div class="card">🏆<div id="points" class="value green">0</div><p class="small">puntos líder</p></div>
+<div class="card">🚴<div id="activities" class="value">0</div><p class="small">salidas</p></div>
+<div class="card">📍<div id="km" class="value">0</div><p class="small">kilómetros</p></div>
+<div class="card">⛰️<div id="elevation" class="value orange">0</div><p class="small">desnivel +</p></div>
 </div>
 
-<div class="grid">
+<div class="panel">
+<h2>🐗 PODIO JABALÍ</h2>
+<div id="podiumCards" class="podium"></div>
+</div>
+
+<div class="grid" style="margin-top:18px">
 <div>
 <div class="panel">
 <h2>🏆 CLASIFICACIÓN</h2>
 <table>
 <thead>
 <tr>
-<th>POS.</th>
-<th>JABALÍ</th>
-<th>PUNTOS</th>
-<th>SALIDAS</th>
-<th>KM</th>
-<th>DESNIVEL</th>
+<th>POS.</th><th>JABALÍ</th><th>PUNTOS</th><th>SALIDAS</th><th>KM</th><th>DESNIVEL</th>
 </tr>
 </thead>
 <tbody id="rankingRows"></tbody>
@@ -107,11 +108,6 @@ td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 
 <div>
 <div class="panel">
-<h2>🐗 PODIO JABALÍ</h2>
-<div id="podium"></div>
-</div>
-
-<div class="panel" style="margin-top:18px">
 <h2>📈 TEMPORADA</h2>
 <div class="value green" id="seasonPoints">0</div>
 <p class="small">puntos del líder</p>
@@ -141,16 +137,15 @@ function clasePodio(pos){
   return "";
 }
 
+function inicial(nombre){
+  return (nombre || "J").trim().charAt(0).toUpperCase();
+}
+
 async function loadDashboard(){
   document.getElementById("msg").innerText = "Actualizando...";
 
-  const leaderboard = await supabaseClient
-    .from("leaderboard")
-    .select("*");
-
-  const recent = await supabaseClient
-    .from("recent_activities")
-    .select("*");
+  const leaderboard = await supabaseClient.from("leaderboard").select("*");
+  const recent = await supabaseClient.from("recent_activities").select("*");
 
   if(leaderboard.error){
     document.getElementById("msg").innerText = leaderboard.error.message;
@@ -165,7 +160,6 @@ async function loadDashboard(){
   const lider = leaderboard.data[0];
 
   document.getElementById("msg").innerText = "🟢 Datos cargados";
-
   document.getElementById("points").innerText = Math.round(lider.total_points);
   document.getElementById("activities").innerText = lider.activities;
   document.getElementById("km").innerText = lider.total_km;
@@ -176,33 +170,39 @@ async function loadDashboard(){
   let rows = "";
   let podium = "";
 
+  const podioOrden = [
+    leaderboard.data.find(x => x.position === 2),
+    leaderboard.data.find(x => x.position === 1),
+    leaderboard.data.find(x => x.position === 3)
+  ].filter(Boolean);
+
+  podioOrden.forEach((r)=>{
+    podium += `
+    <div class="podium-card ${r.position === 1 ? "first" : ""}">
+      <div class="${clasePodio(r.position)}">${tituloPodio(r.position)}</div>
+      <div class="avatar">${inicial(r.profile_name)}</div>
+      <h3>${r.profile_name}</h3>
+      <div class="value ${clasePodio(r.position)}">${Math.round(r.total_points)}</div>
+      <p class="small">${r.activities} salidas · ${r.total_km} km</p>
+    </div>
+    `;
+  });
+
   leaderboard.data.forEach((r)=>{
     rows += `
     <tr>
       <td><span class="rank">${r.position}</span></td>
-      <td>
-        <strong>${r.profile_name}</strong><br>
-        <span class="badge ${clasePodio(r.position)}">${tituloPodio(r.position)}</span>
-      </td>
+      <td><strong>${r.profile_name}</strong><br><span class="badge">${tituloPodio(r.position)}</span></td>
       <td class="green"><strong>${Math.round(r.total_points)}</strong> pts</td>
       <td>${r.activities}</td>
       <td>${r.total_km} km</td>
       <td>${r.total_elevation} m+</td>
     </tr>
     `;
-
-    if(r.position <= 3){
-      podium += `
-      <p class="${clasePodio(r.position)}">
-        ${tituloPodio(r.position)}<br>
-        <strong>${r.profile_name}</strong> — ${Math.round(r.total_points)} pts
-      </p>
-      `;
-    }
   });
 
+  document.getElementById("podiumCards").innerHTML = podium;
   document.getElementById("rankingRows").innerHTML = rows;
-  document.getElementById("podium").innerHTML = podium;
 
   let html = "";
 
