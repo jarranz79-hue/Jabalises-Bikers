@@ -5,26 +5,272 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
-body{background:#111827;color:white;font-family:Arial;padding:30px;text-align:center}
-.card{background:#1f2937;max-width:900px;margin:auto;padding:25px;border-radius:18px}
-button{padding:14px;border-radius:10px;border:0;background:#fc4c02;color:white;cursor:pointer;font-weight:bold}
-.box{background:#374151;padding:18px;margin:12px;border-radius:12px}
-.points{font-size:40px;color:#22c55e;font-weight:bold}
-.small{color:#9ca3af;white-space:pre-wrap}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#07111f;
+  color:#f8fafc;
+  font-family:Arial, sans-serif;
+}
+.app{
+  display:grid;
+  grid-template-columns:240px 1fr;
+  min-height:100vh;
+}
+.sidebar{
+  background:#091421;
+  border-right:1px solid #1f2937;
+  padding:24px 16px;
+}
+.logo{
+  font-size:24px;
+  font-weight:bold;
+  margin-bottom:40px;
+}
+.logo span{color:#f97316}
+.nav div{
+  padding:16px;
+  margin:10px 0;
+  border-radius:12px;
+  color:#cbd5e1;
+}
+.nav .active{
+  background:#3b2416;
+  color:#f97316;
+  font-weight:bold;
+}
+.profile{
+  margin-top:80px;
+  background:#111827;
+  padding:18px;
+  border-radius:16px;
+}
+.main{
+  padding:28px;
+}
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+h1{
+  font-size:42px;
+  margin:0;
+}
+.season{
+  color:#f97316;
+  font-size:20px;
+  font-weight:bold;
+}
+.update{
+  background:#f97316;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:14px 20px;
+  font-weight:bold;
+  cursor:pointer;
+}
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+  gap:14px;
+  margin:28px 0;
+}
+.card{
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:16px;
+  padding:22px;
+}
+.card .label{
+  color:#94a3b8;
+  font-size:13px;
+}
+.card .value{
+  font-size:34px;
+  font-weight:bold;
+  margin-top:8px;
+}
+.green{color:#22c55e}
+.blue{color:#3b82f6}
+.orange{color:#f97316}
+.yellow{color:#facc15}
+.content{
+  display:grid;
+  grid-template-columns:1fr 320px;
+  gap:18px;
+}
+.panel{
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:18px;
+  padding:20px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:14px;
+  border-bottom:1px solid #1f2937;
+  text-align:left;
+}
+th{color:#94a3b8;font-size:13px}
+.rank{
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  background:#facc15;
+  color:#111827;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+.badge{
+  border:1px solid #f97316;
+  color:#f97316;
+  border-radius:8px;
+  padding:3px 8px;
+  font-size:12px;
+}
+.sidebox{
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:16px;
+  padding:18px;
+  margin-bottom:16px;
+}
+.big{
+  font-size:32px;
+  font-weight:bold;
+}
+.small{
+  color:#94a3b8;
+}
+@media(max-width:900px){
+  .app{grid-template-columns:1fr}
+  .sidebar{display:none}
+  .content{grid-template-columns:1fr}
+}
 </style>
 </head>
 
 <body>
-<div class="card">
-<h1>🏔️ Jabalises Bikers</h1>
-<p>Ranking semanal</p>
 
-<button onclick="loadRanking()">🏆 Actualizar ranking</button>
+<div class="app">
 
-<p id="msg" class="small">Preparado</p>
-<div id="ranking"></div>
+<aside class="sidebar">
+  <div class="logo">🐗 JABALISES<br><span>BIKERS</span></div>
+
+  <div class="nav">
+    <div class="active">🏆 Ranking</div>
+    <div>🚴 Actividades</div>
+    <div>📅 Calendario</div>
+    <div>📊 Estadísticas</div>
+    <div>🎯 Desafíos</div>
+    <div>⚙️ Ajustes</div>
+  </div>
+
+  <div class="profile">
+    <strong>Jabalí Master</strong>
+    <p><span id="profilePoints">0</span> pts</p>
+    <span class="badge">ADMIN</span>
+  </div>
+</aside>
+
+<main class="main">
+
+  <div class="top">
+    <div>
+      <h1>Ranking semanal</h1>
+      <div class="season">Temporada 2026</div>
+    </div>
+
+    <button class="update" onclick="loadRanking()">
+      🔄 Actualizar datos
+    </button>
+  </div>
+
+  <p id="msg" class="small">Cargando ranking...</p>
+
+  <section class="cards">
+    <div class="card">
+      <div class="label">🏆 PUNTOS TOTALES</div>
+      <div id="points" class="value green">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">🚴 ACTIVIDADES</div>
+      <div id="activities" class="value blue">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">📍 KM TOTALES</div>
+      <div id="km" class="value">0</div>
+    </div>
+
+    <div class="card">
+      <div class="label">⛰️ DESNIVEL +</div>
+      <div id="elevation" class="value orange">0</div>
+    </div>
+  </section>
+
+  <section class="content">
+
+    <div>
+      <div class="panel">
+        <h2>⚖️ CLASIFICACIÓN</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>POS.</th>
+              <th>JABALÍ</th>
+              <th>PUNTOS</th>
+              <th>ACTIVIDADES</th>
+              <th>KM</th>
+              <th>DESNIVEL +</th>
+            </tr>
+          </thead>
+          <tbody id="rankingRows">
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel" style="margin-top:18px">
+        <h2>🚴 ACTIVIDADES RECIENTES</h2>
+        <p class="small">Siguiente paso: traer aquí las últimas salidas guardadas.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebox">
+        <h3>🔥 RACHA ACTUAL</h3>
+        <div class="big orange">7 días</div>
+        <p class="small">¡Sigue así, jabalí!</p>
+      </div>
+
+      <div class="sidebox">
+        <h3>🎯 PRÓXIMO DESAFÍO</h3>
+        <strong>Desafío Montañero</strong>
+        <p class="small">Completa 3 rutas con +1000m</p>
+      </div>
+
+      <div class="sidebox">
+        <h3>📈 TEMPORADA 2026</h3>
+        <div class="big green" id="seasonPoints">0 pts</div>
+        <p class="small">Top 1 de 1 jabalí</p>
+      </div>
+    </div>
+
+  </section>
+
+</main>
+
 </div>
 
 <script>
@@ -37,52 +283,63 @@ const supabaseClient = window.supabase.createClient(
 );
 
 async function loadRanking(){
-  document.getElementById("msg").innerText = "Cargando ranking...";
+  document.getElementById("msg").innerText = "Actualizando datos...";
 
-  try{
-    const { data, error } = await supabaseClient
-      .from("weekly_ranking")
-      .select("*")
-      .limit(1);
+  const { data, error } = await supabaseClient
+    .from("weekly_ranking")
+    .select("*")
+    .limit(1);
 
-    if(error){
-      document.getElementById("msg").innerText =
-      "❌ Error Supabase:\n" + JSON.stringify(error);
-      return;
-    }
-
-    if(!data || data.length === 0){
-      document.getElementById("msg").innerText =
-      "⚠️ No hay datos en weekly_ranking";
-      return;
-    }
-
-    const r = data[0];
-
+  if(error){
     document.getElementById("msg").innerText =
-    "✅ Ranking actualizado";
-
-    document.getElementById("ranking").innerHTML =
-    `
-    <div class="box">
-      <h2>🏆 Semana ${r.week}</h2>
-      <div class="points">${r.total_points}</div>
-      <p>puntos</p>
-    </div>
-
-    <div class="grid">
-      <div class="box">🚴<br>${r.activities}<br>salidas</div>
-      <div class="box">📍<br>${r.total_km}<br>km</div>
-      <div class="box">⛰️<br>${r.total_elevation}<br>m+</div>
-    </div>
-    `;
-  }catch(e){
-    document.getElementById("msg").innerText =
-    "❌ Error JavaScript:\n" + e.message;
+    "❌ " + error.message;
+    return;
   }
+
+  if(!data || data.length === 0){
+    document.getElementById("msg").innerText =
+    "No hay datos todavía";
+    return;
+  }
+
+  const r = data[0];
+
+  document.getElementById("msg").innerText =
+  "🟢 Última actualización correcta";
+
+  document.getElementById("points").innerText =
+  Math.round(r.total_points);
+
+  document.getElementById("activities").innerText =
+  r.activities;
+
+  document.getElementById("km").innerText =
+  r.total_km;
+
+  document.getElementById("elevation").innerText =
+  r.total_elevation;
+
+  document.getElementById("profilePoints").innerText =
+  Math.round(r.total_points);
+
+  document.getElementById("seasonPoints").innerText =
+  Math.round(r.total_points) + " pts";
+
+  document.getElementById("rankingRows").innerHTML =
+  `
+  <tr>
+    <td><span class="rank">1</span></td>
+    <td><strong>Jabalí Master</strong> <span class="badge">TÚ</span></td>
+    <td class="green"><strong>${Math.round(r.total_points)}</strong></td>
+    <td>${r.activities}</td>
+    <td>${r.total_km}</td>
+    <td>${r.total_elevation} m</td>
+  </tr>
+  `;
 }
 
 loadRanking();
 </script>
+
 </body>
 </html>
