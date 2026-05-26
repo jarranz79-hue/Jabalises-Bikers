@@ -7,30 +7,156 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#07111f;color:white;font-family:Arial;padding:22px}
-h1{margin:0;color:#f97316;font-size:34px}
-.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px}
-button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold}
-.status{color:#94a3b8;margin-top:8px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.card{background:#111827;border:1px solid #1f2937;border-radius:22px;padding:22px;margin-bottom:16px}
-.value{font-size:42px;font-weight:bold;color:#22c55e}
-.label{color:#94a3b8}
-.profile{display:flex;gap:16px;align-items:center}
-.avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#f97316,#facc15);color:#111827;font-size:34px;font-weight:bold;display:flex;align-items:center;justify-content:center}
-.badge{display:inline-block;margin-top:8px;border:1px solid #f97316;color:#f97316;padding:6px 10px;border-radius:999px}
-.activity{padding:14px 0;border-bottom:1px solid #1f2937}
-.activity:last-child{border-bottom:0}
-.small{color:#94a3b8}
-.podium{display:grid;grid-template-columns:1fr;gap:12px}
-.podium-item{background:#0b1224;border-radius:16px;padding:14px}
+
+body{
+  margin:0;
+  background:radial-gradient(circle at top,#15233d,#07111f 60%);
+  color:white;
+  font-family:Arial;
+  padding:22px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:22px;
+}
+
+h1{
+  margin:0;
+  color:#f97316;
+  font-size:34px;
+}
+
+button{
+  background:#f97316;
+  color:white;
+  border:0;
+  border-radius:14px;
+  padding:14px 20px;
+  font-weight:bold;
+}
+
+.status{
+  color:#94a3b8;
+  margin-top:6px;
+}
+
+.layout{
+  display:grid;
+  grid-template-columns:1.4fr 1fr;
+  gap:18px;
+}
+
+.card{
+  background:rgba(17,24,39,.95);
+  border:1px solid #1f2937;
+  border-radius:24px;
+  padding:22px;
+  margin-bottom:16px;
+  box-shadow:0 12px 30px rgba(0,0,0,.25);
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.value{
+  font-size:42px;
+  font-weight:bold;
+  color:#22c55e;
+}
+
+.label,.small{
+  color:#94a3b8;
+}
+
+.profile{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+
+.avatar{
+  width:86px;
+  height:86px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#f97316,#facc15);
+  color:#111827;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:38px;
+  font-weight:bold;
+}
+
+.badge{
+  display:inline-block;
+  margin-top:8px;
+  border:1px solid #f97316;
+  color:#f97316;
+  padding:7px 12px;
+  border-radius:999px;
+}
+
+.podium{
+  display:grid;
+  grid-template-columns:1fr 1.2fr 1fr;
+  gap:12px;
+  align-items:end;
+}
+
+.podium-card{
+  background:#0b1224;
+  border:1px solid #1f2937;
+  border-radius:22px;
+  padding:18px;
+  text-align:center;
+}
+
+.podium-card.first{
+  border:2px solid #facc15;
+  transform:scale(1.05);
+  box-shadow:0 0 26px rgba(250,204,21,.25);
+}
+
 .gold{color:#facc15}
 .silver{color:#cbd5e1}
 .bronze{color:#fb923c}
-@media(min-width:900px){
-body{padding:34px}
-.layout{display:grid;grid-template-columns:1.5fr 1fr;gap:18px}
-.grid{grid-template-columns:repeat(4,1fr)}
+.green{color:#22c55e}
+.orange{color:#f97316}
+
+.activity{
+  padding:14px 0;
+  border-bottom:1px solid #1f2937;
+}
+
+.activity:last-child{
+  border-bottom:0;
+}
+
+.progress{
+  height:12px;
+  background:#1f2937;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:12px;
+}
+
+.progress-bar{
+  height:100%;
+  background:linear-gradient(90deg,#22c55e,#facc15);
+  width:0%;
+}
+
+@media(max-width:900px){
+  .layout{grid-template-columns:1fr}
+  .grid{grid-template-columns:1fr 1fr}
+  .podium{grid-template-columns:1fr}
+  .podium-card.first{transform:none}
 }
 </style>
 </head>
@@ -38,56 +164,73 @@ body{padding:34px}
 <body>
 
 <div class="header">
-<div>
-<h1>🐗 Jabalises Bikers</h1>
-<div id="status" class="status">Preparado</div>
-</div>
-<button onclick="loadDashboard()">🔄 Actualizar</button>
+  <div>
+    <h1>🐗 Jabalises Bikers</h1>
+    <div id="status" class="status">Preparado</div>
+  </div>
+
+  <button onclick="loadDashboard()">🔄 Actualizar</button>
 </div>
 
 <div class="layout">
 
-<div>
+  <div>
 
-<div class="card">
-<h2>👤 Perfil Jabalí</h2>
-<div class="profile">
-<div id="avatar" class="avatar">J</div>
-<div id="profile">Esperando perfil...</div>
-</div>
-</div>
+    <div class="card">
+      <h2>👤 Perfil Jabalí</h2>
+      <div class="profile">
+        <div id="avatar" class="avatar">J</div>
+        <div id="profile">Esperando perfil...</div>
+      </div>
 
-<div class="grid">
-<div class="card"><div class="label">🏆 Puntos</div><div id="points" class="value">0</div></div>
-<div class="card"><div class="label">🚴 Salidas</div><div id="activities" class="value">0</div></div>
-<div class="card"><div class="label">📍 Kilómetros</div><div id="km" class="value">0</div></div>
-<div class="card"><div class="label">⛰️ Desnivel</div><div id="elevation" class="value">0</div></div>
-</div>
+      <div class="progress">
+        <div id="levelProgress" class="progress-bar"></div>
+      </div>
+      <p id="levelText" class="small">Progreso de nivel</p>
+    </div>
 
-<div class="card">
-<h2>🚴 Actividades recientes</h2>
-<div id="recent">Cargando...</div>
-</div>
+    <div class="grid">
+      <div class="card">
+        <div class="label">🏆 Puntos</div>
+        <div id="points" class="value">0</div>
+      </div>
 
-</div>
+      <div class="card">
+        <div class="label">🚴 Salidas</div>
+        <div id="activities" class="value">0</div>
+      </div>
 
-<div>
+      <div class="card">
+        <div class="label">📍 Kilómetros</div>
+        <div id="km" class="value">0</div>
+      </div>
 
-<div class="card">
-<h2>🐗 Podio Jabalí</h2>
-<div class="podium">
-<div class="podium-item gold">🥇 <strong>Gran Jabalí</strong><br><span id="podium1" class="small">Pendiente</span></div>
-<div class="podium-item silver">🥈 <strong>Colmillo de Plata</strong><br><span id="podium2" class="small">Pendiente</span></div>
-<div class="podium-item bronze">🥉 <strong>Pezuña de Hierro</strong><br><span id="podium3" class="small">Pendiente</span></div>
-</div>
-</div>
+      <div class="card">
+        <div class="label">⛰️ Desnivel</div>
+        <div id="elevation" class="value">0</div>
+      </div>
+    </div>
 
-<div class="card">
-<h2>🏆 Ranking semanal</h2>
-<div id="rankingList">Cargando ranking...</div>
-</div>
+    <div class="card">
+      <h2>🚴 Actividades recientes</h2>
+      <div id="recent">Cargando...</div>
+    </div>
 
-</div>
+  </div>
+
+  <div>
+
+    <div class="card">
+      <h2>🐗 Podio Jabalí</h2>
+      <div id="podium" class="podium"></div>
+    </div>
+
+    <div class="card">
+      <h2>🏆 Ranking semanal</h2>
+      <div id="rankingList">Cargando...</div>
+    </div>
+
+  </div>
 
 </div>
 
@@ -122,75 +265,116 @@ function podioTitulo(pos){
   return "#" + pos;
 }
 
+function podioClase(pos){
+  if(pos === 1) return "gold";
+  if(pos === 2) return "silver";
+  if(pos === 3) return "bronze";
+  return "";
+}
+
 async function loadDashboard(){
   const status = document.getElementById("status");
 
   try{
     status.innerText = "Leyendo perfil...";
+
     const profiles = await readTable("profile_dashboard");
 
     if(profiles.length > 0){
       const p = profiles[0];
       const name = p.display_name || "Jabalí";
+      const points = p.total_points || 0;
+      const level = p.level || 1;
 
-      document.getElementById("avatar").innerText = name.charAt(0).toUpperCase();
+      document.getElementById("avatar").innerText =
+        name.charAt(0).toUpperCase();
+
       document.getElementById("profile").innerHTML =
         "🐗 <strong>" + name + "</strong><br>" +
         "<span class='badge'>🏆 " + (p.badge || "Sin insignia") + "</span><br>" +
-        "🔥 Nivel " + (p.level || 1) + "<br>" +
-        "⭐ " + (p.total_points || 0) + " pts";
+        "🔥 Nivel " + level + "<br>" +
+        "⭐ " + points + " pts";
+
+      const progress = Math.min(100, points % 250 / 250 * 100);
+
+      document.getElementById("levelProgress").style.width =
+        progress + "%";
+
+      document.getElementById("levelText").innerText =
+        Math.round(progress) + "% para el siguiente nivel";
     }
 
     status.innerText = "Leyendo ranking...";
+
     const ranking = await readTable("leaderboard");
 
     if(ranking.length > 0){
-      const r = ranking[0];
+      const leader = ranking[0];
 
-      document.getElementById("points").innerText = Math.round(r.total_points || 0);
-      document.getElementById("activities").innerText = r.activities || 0;
-      document.getElementById("km").innerText = Math.round(r.total_km || 0);
-      document.getElementById("elevation").innerText = Math.round(r.total_elevation || 0);
+      document.getElementById("points").innerText =
+        Math.round(leader.total_points || 0);
+
+      document.getElementById("activities").innerText =
+        leader.activities || 0;
+
+      document.getElementById("km").innerText =
+        Math.round(leader.total_km || 0);
+
+      document.getElementById("elevation").innerText =
+        Math.round(leader.total_elevation || 0);
 
       let rankingHtml = "";
+      let podiumHtml = "";
 
       ranking.forEach((j)=>{
         rankingHtml +=
           "<div class='activity'>" +
           "<strong>" + podioTitulo(j.position) + "</strong><br>" +
           "<span class='small'>" +
-          (j.profile_name || "Jabalí") + " · 🏆 " +
-          Math.round(j.total_points || 0) + " pts · " +
-          (j.activities || 0) + " salidas" +
+          (j.profile_name || "Jabalí") +
+          " · 🏆 " + Math.round(j.total_points || 0) +
+          " pts · " + (j.activities || 0) + " salidas" +
           "</span>" +
           "</div>";
+
+        if(j.position <= 3){
+          podiumHtml +=
+            "<div class='podium-card " + (j.position === 1 ? "first" : "") + "'>" +
+            "<div class='" + podioClase(j.position) + "'>" + podioTitulo(j.position) + "</div>" +
+            "<h3>" + (j.profile_name || "Jabalí") + "</h3>" +
+            "<div class='value " + podioClase(j.position) + "'>" +
+            Math.round(j.total_points || 0) +
+            "</div>" +
+            "<p class='small'>" + (j.activities || 0) + " salidas · " +
+            Math.round(j.total_km || 0) + " km</p>" +
+            "</div>";
+        }
       });
 
       document.getElementById("rankingList").innerHTML = rankingHtml;
-
-      if(ranking[0]) document.getElementById("podium1").innerText = (ranking[0].profile_name || "Jabalí") + " · " + Math.round(ranking[0].total_points || 0) + " pts";
-      if(ranking[1]) document.getElementById("podium2").innerText = (ranking[1].profile_name || "Jabalí") + " · " + Math.round(ranking[1].total_points || 0) + " pts";
-      if(ranking[2]) document.getElementById("podium3").innerText = (ranking[2].profile_name || "Jabalí") + " · " + Math.round(ranking[2].total_points || 0) + " pts";
+      document.getElementById("podium").innerHTML = podiumHtml;
     }
 
     status.innerText = "Leyendo actividades...";
+
     const recent = await readTable("recent_activities");
 
     let html = "";
 
     recent.forEach((a)=>{
       html +=
-      "<div class='activity'>" +
-      "<strong>" + (a.name || "Actividad") + "</strong><br>" +
-      "<span class='small'>" +
-      (a.distance_km || 0) + " km · " +
-      (a.elevation_m || 0) + " m+ · " +
-      "🏆 " + (a.points || 0) +
-      "</span>" +
-      "</div>";
+        "<div class='activity'>" +
+        "<strong>" + (a.name || "Actividad") + "</strong><br>" +
+        "<span class='small'>" +
+        (a.distance_km || 0) + " km · " +
+        (a.elevation_m || 0) + " m+ · " +
+        "🏆 " + (a.points || 0) +
+        "</span>" +
+        "</div>";
     });
 
     document.getElementById("recent").innerHTML = html;
+
     status.innerText = "🟢 Dashboard cargado";
   }
 
