@@ -10,29 +10,138 @@
 *{box-sizing:border-box}
 body{margin:0;background:#07111f;color:white;font-family:Arial}
 .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
-.sidebar{background:#091421;padding:24px;border-right:1px solid #1f2937}
-.logo{font-size:34px;font-weight:bold;margin-bottom:40px}
-.logo span{color:#f97316}
-.nav div{padding:16px;margin:10px 0;border-radius:14px}
-.active{background:#26170d;color:#f97316}
-.profile,.card,.panel{background:#111827;border-radius:20px;padding:22px}
-.avatar{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#f97316,#facc15);display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:bold;color:#111827;margin:auto}
-.badge{display:inline-block;margin-top:14px;padding:8px 12px;border-radius:999px;border:1px solid #f97316;color:#f97316}
-.level{margin-top:16px;font-size:32px;font-weight:bold;color:#22c55e}
-.points{margin-top:14px;font-size:24px;font-weight:bold}
-.main{padding:30px}
-.top{display:flex;justify-content:space-between;align-items:center}
-button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:white;cursor:pointer;font-weight:bold}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px}
-.value{font-size:34px;font-weight:bold;margin-top:10px}
-.green{color:#22c55e}
-.orange{color:#f97316}
+
+.sidebar{
+background:#091421;
+padding:24px;
+border-right:1px solid #1f2937;
+}
+
+.main{
+padding:30px;
+}
+
+.logo{
+font-size:34px;
+font-weight:bold;
+margin-bottom:40px;
+}
+
+.logo span{
+color:#f97316;
+}
+
+.nav div{
+padding:14px;
+margin:8px 0;
+border-radius:12px;
+}
+
+.active{
+background:#26170d;
+color:#f97316;
+}
+
+.profile,.card,.panel{
+background:#111827;
+border-radius:20px;
+padding:22px;
+}
+
+.avatar{
+width:90px;
+height:90px;
+border-radius:50%;
+background:linear-gradient(135deg,#f97316,#facc15);
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:40px;
+font-weight:bold;
+color:#111827;
+margin:auto;
+}
+
+.badge{
+display:inline-block;
+padding:8px 12px;
+border-radius:999px;
+border:1px solid #f97316;
+color:#f97316;
+margin-top:12px;
+}
+
+.level{
+font-size:30px;
+color:#22c55e;
+font-weight:bold;
+}
+
+.points{
+font-size:24px;
+font-weight:bold;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+button{
+background:#f97316;
+color:white;
+border:0;
+padding:14px 18px;
+border-radius:12px;
+cursor:pointer;
+}
+
+.cards{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:14px;
+margin-top:20px;
+}
+
+.value{
+font-size:34px;
+font-weight:bold;
+}
+
+.grid{
+display:grid;
+grid-template-columns:2fr 1fr;
+gap:18px;
+margin-top:18px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+}
+
+td,th{
+padding:14px;
+border-bottom:1px solid #1f2937;
+text-align:left;
+}
+
+.activity{
+display:flex;
+justify-content:space-between;
+padding:14px 0;
+border-bottom:1px solid #1f2937;
+}
+
+.small{
+color:#94a3b8;
+}
+
 .gold{color:#facc15}
 .silver{color:#cbd5e1}
 .bronze{color:#fb923c}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:20px}
-.activity{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1f2937}
-.small{color:#94a3b8}
+
 @media(max-width:900px){
 .app{grid-template-columns:1fr}
 .sidebar{display:none}
@@ -47,7 +156,12 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 <div class="app">
 
 <aside class="sidebar">
-<div class="logo">🐗 JABALISES<br><span>BIKERS</span></div>
+
+<div class="logo">
+🐗 JABALISES
+<br>
+<span>BIKERS</span>
+</div>
 
 <div class="nav">
 <div class="active">🏆 Ranking</div>
@@ -57,47 +171,141 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 </div>
 
 <div class="profile">
-<div id="avatar" class="avatar">J</div>
-<h2 id="displayName">Jabalí</h2>
-<div id="badge" class="badge">Gran Jabalí</div>
-<div id="level" class="level">Nivel 1</div>
-<div id="profilePoints" class="points">0 pts</div>
+
+<div id="avatar" class="avatar">
+J
 </div>
+
+<h2 id="displayName">
+Jabalí
+</h2>
+
+<div id="badge" class="badge">
+Gran Jabalí
+</div>
+
+<div id="level" class="level">
+Nivel 1
+</div>
+
+<div id="profilePoints" class="points">
+0 pts
+</div>
+
+</div>
+
 </aside>
 
 <main class="main">
 
 <div class="top">
+
 <div>
-<h1>Dashboard</h1>
-<p id="welcome" class="small">Cargando datos...</p>
+
+<h1>
+Dashboard
+</h1>
+
+<p id="welcome" class="small">
+Cargando...
+</p>
+
 </div>
-<button onclick="loadDashboard()">🔄 Actualizar</button>
+
+<button onclick="loadDashboard()">
+
+🔄 Actualizar
+
+</button>
+
 </div>
 
 <div class="cards">
-<div class="card">🏆<div id="points" class="value green">0</div><p class="small">puntos</p></div>
-<div class="card">🚴<div id="activities" class="value">0</div><p class="small">salidas</p></div>
-<div class="card">📍<div id="km" class="value">0</div><p class="small">kilómetros</p></div>
-<div class="card">⛰️<div id="elevation" class="value orange">0</div><p class="small">desnivel +</p></div>
+
+<div class="card">
+🏆
+<div id="points" class="value gold">0</div>
+</div>
+
+<div class="card">
+🚴
+<div id="activities" class="value">0</div>
+</div>
+
+<div class="card">
+📍
+<div id="km" class="value">0</div>
+</div>
+
+<div class="card">
+⛰️
+<div id="elevation" class="value">0</div>
+</div>
+
 </div>
 
 <div class="grid">
 
 <div>
+
 <div class="panel">
-<h2>🚴 Actividades recientes</h2>
-<div id="recent"></div>
+
+<h2>
+🏆 Clasificación
+</h2>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>POS</th>
+
+<th>JABALÍ</th>
+
+<th>PUNTOS</th>
+
+<th>SALIDAS</th>
+
+</tr>
+
+</thead>
+
+<tbody id="leaderboard">
+
+</tbody>
+
+</table>
+
 </div>
+
+<div class="panel" style="margin-top:18px">
+
+<h2>
+🚴 Actividades recientes
+</h2>
+
+<div id="recent"></div>
+
+</div>
+
 </div>
 
 <div>
+
 <div class="panel">
-<h2>🏆 Podio Jabalí</h2>
+
+<h2>
+🐗 Podio
+</h2>
+
 <p class="gold">🥇 Gran Jabalí</p>
 <p class="silver">🥈 Colmillo de Plata</p>
 <p class="bronze">🥉 Pezuña de Hierro</p>
+
 </div>
+
 </div>
 
 </div>
@@ -107,98 +315,181 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 </div>
 
 <script>
-const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
 
-const supabaseClient = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_KEY
+const SUPABASE_URL="https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
+
+const supabase=
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
 );
 
 async function loadDashboard(){
-  try{
-    const profile = await supabaseClient
-      .from("profile_dashboard")
-      .select("*");
 
-    if(profile.data && profile.data.length > 0){
-      const p = profile.data[0];
+const profile=
+await supabase
+.from("profile_dashboard")
+.select("*");
 
-      const name = p.display_name || "Jabalí";
-      const badge = p.badge || "Sin insignia";
-      const level = p.level || 1;
-      const totalPoints = p.total_points || 0;
+if(profile.data?.length){
 
-      document.getElementById("avatar").innerText =
-        name.charAt(0).toUpperCase();
+const p=
+profile.data[0];
 
-      document.getElementById("displayName").innerText =
-        "🐗 " + name;
+displayName.innerText=
+"🐗 "+p.display_name;
 
-      document.getElementById("badge").innerText =
-        "🏆 " + badge;
+avatar.innerText=
+p.display_name[0];
 
-      document.getElementById("level").innerText =
-        "🔥 Nivel " + level;
+badge.innerText=
+"🏆 "+p.badge;
 
-      document.getElementById("profilePoints").innerText =
-        "⭐ " + totalPoints + " pts";
+level.innerText=
+"🔥 Nivel "+p.level;
 
-      document.getElementById("welcome").innerText =
-        "Bienvenido " + name + " · " + badge;
-    }
+profilePoints.innerText=
+"⭐ "+p.total_points;
 
-    const ranking = await supabaseClient
-      .from("weekly_ranking")
-      .select("*")
-      .limit(1);
+welcome.innerText=
+"Bienvenido "+p.display_name;
 
-    if(ranking.data && ranking.data.length > 0){
-      const r = ranking.data[0];
+}
 
-      document.getElementById("points").innerText =
-        Math.round(r.total_points || 0);
+const ranking=
+await supabase
+.from("weekly_ranking")
+.select("*")
+.limit(1);
 
-      document.getElementById("activities").innerText =
-        r.activities || 0;
+if(ranking.data?.length){
 
-      document.getElementById("km").innerText =
-        r.total_km || 0;
+const r=
+ranking.data[0];
 
-      document.getElementById("elevation").innerText =
-        r.total_elevation || 0;
-    }
+points.innerText=
+r.total_points;
 
-    const recent = await supabaseClient
-      .from("recent_activities")
-      .select("*");
+activities.innerText=
+r.activities;
 
-    let html = "";
+km.innerText=
+r.total_km;
 
-    if(recent.data){
-      recent.data.forEach((a)=>{
-        html += `
-        <div class="activity">
-          <div>
-            <strong>${a.name || "Actividad"}</strong><br>
-            <span class="small">${a.distance_km || 0} km · ${a.elevation_m || 0} m+</span>
-          </div>
-          <div class="green">🏆 ${a.points || 0}</div>
-        </div>
-        `;
-      });
-    }
+elevation.innerText=
+r.total_elevation;
 
-    document.getElementById("recent").innerHTML = html;
-  }
+}
 
-  catch(e){
-    document.getElementById("welcome").innerText =
-      "Error cargando dashboard";
-  }
+const board=
+await supabase
+.from("leaderboard")
+.select("*");
+
+let rows="";
+
+board.data?.forEach(
+(r)=>{
+
+rows+=`
+
+<tr>
+
+<td>
+
+${r.position}
+
+</td>
+
+<td>
+
+${r.profile_name}
+
+</td>
+
+<td>
+
+🏆 ${r.total_points}
+
+</td>
+
+<td>
+
+${r.activities}
+
+</td>
+
+</tr>
+
+`;
+
+}
+
+);
+
+leaderboard.innerHTML=
+rows;
+
+const recent=
+await supabase
+.from("recent_activities")
+.select("*");
+
+let html="";
+
+recent.data?.forEach(
+(a)=>{
+
+html+=`
+
+<div class="activity">
+
+<div>
+
+<strong>
+
+${a.name}
+
+</strong>
+
+<br>
+
+<span class="small">
+
+${a.distance_km}
+km
+
+</span>
+
+</div>
+
+<div>
+
+🏆
+${a.points}
+
+</div>
+
+</div>
+
+`;
+
+}
+
+);
+
+document
+.getElementById(
+"recent"
+)
+.innerHTML=
+html;
+
 }
 
 loadDashboard();
+
 </script>
 
 </body>
