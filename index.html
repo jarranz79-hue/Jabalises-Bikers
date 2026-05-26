@@ -45,7 +45,7 @@ async function loadApp(){
     status.innerText = "Cargando ranking...";
 
     const result = await supabase
-      .from("weekly_ranking")
+      .from("rankings")
       .select("*")
       .limit(1);
 
@@ -62,9 +62,14 @@ async function loadApp(){
     const r = result.data[0];
 
     document.getElementById("points").innerText = Math.round(r.total_points || 0);
-    document.getElementById("activities").innerText = r.activities || 0;
-    document.getElementById("km").innerText = r.total_km || 0;
-    document.getElementById("elevation").innerText = r.total_elevation || 0;
+    document.getElementById("activities").innerText =
+r.activities || 0;
+
+document.getElementById("km").innerText =
+r.total_km || 0;
+
+document.getElementById("elevation").innerText =
+r.total_elevation || 0;
 
     status.innerText = "🟢 Ranking cargado";
   }catch(e){
