@@ -4,463 +4,104 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-
-*{box-sizing:border-box}
-
 body{
-margin:0;
-background:#07111f;
-color:white;
-font-family:Arial;
-}
-
-.container{
-padding:30px;
-max-width:1500px;
-margin:auto;
-}
-
-.top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-button{
-background:#f97316;
-color:white;
-border:0;
-padding:14px 20px;
-border-radius:12px;
-cursor:pointer;
-font-weight:bold;
-}
-
-.small{
-color:#94a3b8;
-}
-
-.cards{
-
-display:grid;
-
-grid-template-columns:
-repeat(
-4,
-1fr
-);
-
-gap:18px;
-
-margin-top:30px;
-
+  margin:0;
+  background:#07111f;
+  color:white;
+  font-family:Arial;
+  padding:24px;
 }
 
 .card{
+  background:#111827;
+  border-radius:20px;
+  padding:22px;
+  margin-bottom:18px;
+}
 
-background:#111827;
+h1{
+  color:#f97316;
+}
 
-padding:24px;
+button{
+  background:#f97316;
+  color:white;
+  border:0;
+  border-radius:12px;
+  padding:14px 18px;
+  font-weight:bold;
+}
 
-border-radius:18px;
-
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
 }
 
 .value{
-
-font-size:44px;
-
-font-weight:bold;
-
-margin-top:10px;
-
+  font-size:34px;
+  font-weight:bold;
+  color:#22c55e;
 }
 
-.gold{
-color:#facc15;
-}
-
-.orange{
-color:#f97316;
-}
-
-.green{
-color:#22c55e;
-}
-
-.panel{
-
-background:#111827;
-
-padding:24px;
-
-border-radius:18px;
-
-margin-top:24px;
-
+.small{
+  color:#94a3b8;
 }
 
 .activity{
-
-display:flex;
-
-justify-content:space-between;
-
-padding:14px 0;
-
-border-bottom:
-1px solid
-#1f2937;
-
+  border-bottom:1px solid #1f2937;
+  padding:14px 0;
 }
-
-@media(max-width:900px){
-
-.cards{
-
-grid-template-columns:
-1fr 1fr;
-
-}
-
-}
-
 </style>
-
 </head>
 
 <body>
 
-<div class="container">
+<h1>🐗 Jabalises Bikers</h1>
 
-<div class="top">
+<p id="status" class="small">Preparado</p>
 
-<div>
-
-<h1>
-
-🏆 Jabalises Bikers
-
-</h1>
-
-<p
-id="status"
-class="small">
-
-Preparado
-
-</p>
-
-</div>
-
-<button
-onclick="loadDashboard()">
-
-🔄 Actualizar
-
-</button>
-
-</div>
-
-<div class="cards">
+<button onclick="loadApp()">🔄 Actualizar</button>
 
 <div class="card">
-
-🏆
-
-<div
-id="points"
-class="value gold">
-
-—
-
+  <h2>👤 Perfil</h2>
+  <p id="profile">Cargando perfil...</p>
 </div>
 
-<p class="small">
+<div class="grid">
+  <div class="card">
+    🏆
+    <div id="points" class="value">0</div>
+    <p class="small">Puntos</p>
+  </div>
 
-Puntos
+  <div class="card">
+    🚴
+    <div id="activities" class="value">0</div>
+    <p class="small">Salidas</p>
+  </div>
 
-</p>
+  <div class="card">
+    📍
+    <div id="km" class="value">0</div>
+    <p class="small">Kilómetros</p>
+  </div>
 
+  <div class="card">
+    ⛰️
+    <div id="elevation" class="value">0</div>
+    <p class="small">Desnivel</p>
+  </div>
 </div>
 
 <div class="card">
-
-🚴
-
-<div
-id="activities"
-class="value">
-
-—
-
-</div>
-
-<p class="small">
-
-Salidas
-
-</p>
-
-</div>
-
-<div class="card">
-
-📍
-
-<div
-id="km"
-class="value">
-
-—
-
-</div>
-
-<p class="small">
-
-Kilómetros
-
-</p>
-
-</div>
-
-<div class="card">
-
-⛰️
-
-<div
-id="elevation"
-class="value orange">
-
-—
-
-</div>
-
-<p class="small">
-
-Desnivel
-
-</p>
-
-</div>
-
-</div>
-
-<div class="panel">
-
-<h2>
-
-🚴 Actividades recientes
-
-</h2>
-
-<div
-id="recent">
-
-</div>
-
-</div>
-
+  <h2>🚴 Actividades recientes</h2>
+  <div id="recent"></div>
 </div>
 
 <script>
-
-const SUPABASE_URL =
-"https://bktwylokqyjuoernembh.supabase.co";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
-
-const supabase =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
-
-async function loadDashboard(){
-
-const status =
-document.getElementById(
-"status"
-);
-
-try{
-
-status.innerText =
-"Cargando ranking...";
-
-const ranking =
-await supabase
-
-.from(
-"weekly_ranking"
-)
-
-.select(
-"*"
-)
-
-.limit(
-1
-);
-
-if(
-ranking.error
-){
-
-throw ranking.error;
-
-}
-
-if(
-ranking.data &&
-ranking.data.length
-){
-
-const r =
-ranking.data[0];
-
-document
-.getElementById(
-"points"
-)
-
-.innerText =
-
-Math.round(
-r.total_points ||
-0
-);
-
-document
-.getElementById(
-"activities"
-)
-
-.innerText =
-
-r.activities ||
-0;
-
-document
-.getElementById(
-"km"
-)
-
-.innerText =
-
-r.total_km ||
-0;
-
-document
-.getElementById(
-"elevation"
-)
-
-.innerText =
-
-r.total_elevation ||
-0;
-
-}
-
-status.innerText =
-"Cargando actividades...";
-
-const recent =
-await supabase
-
-.from(
-"recent_activities"
-)
-
-.select(
-"*"
-);
-
-if(
-recent.error
-){
-
-throw recent.error;
-
-}
-
-let html = "";
-
-recent.data.forEach(
-(a)=>{
-
-html += `
-
-<div class="activity">
-
-<div>
-
-<strong>
-
-${a.name}
-
-</strong>
-
-<br>
-
-<span class="small">
-
-${a.distance_km}
-km
-
-</span>
-
-</div>
-
-<div class="green">
-
-🏆
-${a.points}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-);
-
-document
-.getElementById(
-"recent"
-)
-
-.innerHTML =
-
-html;
-
-status.innerText =
-"🟢 Dashboard cargado";
-
-}
-
-catch(e){
-
-status.innerText =
-"❌ " +
-e.message;
-
-}
-
-}
-
-loadDashboard();
-
-</script>
-
-</body>
-
-</html>
+const SUPABASE_URL = "TU_SUPABASE_URL";
+const SUP
