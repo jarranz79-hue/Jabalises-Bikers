@@ -104,4 +104,103 @@ button{
 
 <script>
 const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
-const SUP
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+async function loadApp(){
+  const status = document.getElementById("status");
+
+  try{
+    status.innerText = "Cargando perfil...";
+
+    const profileResult = await supabase
+      .from("profile_dashboard")
+      .select("*")
+      .limit(1);
+
+    if(profileResult.error){
+      throw new Error("Perfil: " + profileResult.error.message);
+    }
+
+    if(profileResult.data && profileResult.data.length > 0){
+      const p = profileResult.data[0];
+
+      document.getElementById("profile").innerHTML =
+      "🐗 <strong>" + (p.display_name || "Jabalí") + "</strong><br>" +
+      "🏆 " + (p.badge || "Sin insignia") + "<br>" +
+      "🔥 Nivel " + (p.level || 1) + "<br>" +
+      "⭐ " + (p.total_points || 0) + " pts";
+    }
+
+    status.innerText = "Cargando ranking...";
+
+    const rankingResult = await supabase
+      .from("weekly_ranking")
+      .select("*")
+      .limit(1);
+
+    if(rankingResult.error){
+      throw new Error("Ranking: " + rankingResult.error.message);
+    }
+
+    if(rankingResult.data && rankingResult.data.length > 0){
+      const r = rankingResult.data[0];
+
+      document.getElementById("points").innerText =
+      Math.round(r.total_points || 0);
+
+      document.getElementById("activities").innerText =
+      r.activities || 0;
+
+      document.getElementById("km").innerText =
+      r.total_km || 0;
+
+      document.getElementById("elevation").innerText =
+      r.total_elevation || 0;
+    }
+
+    status.innerText = "Cargando actividades...";
+
+    const recentResult = await supabase
+      .from("recent_activities")
+      .select("*");
+
+    if(recentResult.error){
+      throw new Error("Actividades: " + recentResult.error.message);
+    }
+
+    let html = "";
+
+    if(recentResult.data){
+      recentResult.data.forEach((a)=>{
+        html +=
+        "<div class='activity'>" +
+        "<strong>" + (a.name || "Actividad") + "</strong><br>" +
+        "<span class='small'>" +
+        (a.distance_km || 0) + " km · " +
+        (a.elevation_m || 0) + " m+ · " +
+        "🏆 " + (a.points || 0) +
+        "</span>" +
+        "</div>";
+      });
+    }
+
+    document.getElementById("recent").innerHTML = html;
+
+    status.innerText = "🟢 App cargada correctamente";
+  }
+
+  catch(error){
+    status.innerText = "❌ " + error.message;
+  }
+}
+
+loadApp();
+</script>
+
+</body>
+</html>
