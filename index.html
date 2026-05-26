@@ -1,739 +1,183 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
-*{
-box-sizing:border-box
-}
-
-body{
-margin:0;
-background:#07111f;
-color:#f8fafc;
-font-family:Arial;
-}
-
-.app{
-display:grid;
-grid-template-columns:240px 1fr;
-min-height:100vh;
-}
-
-.sidebar{
-background:#091421;
-padding:24px;
-border-right:1px solid #1f2937;
-}
-
-.logo{
-font-size:26px;
-font-weight:bold;
-margin-bottom:40px;
-}
-
-.logo span{
-color:#f97316;
-}
-
-.nav div{
-padding:16px;
-margin:10px 0;
-border-radius:12px;
-}
-
-.active{
-background:#26170d;
-color:#f97316;
-}
-
-.profile{
-background:#111827;
-padding:20px;
-border-radius:16px;
-margin-top:60px;
-}
-
-.main{
-padding:30px;
-}
-
-.top{
-display:flex;
-justify-content:space-between;
-align-items:center;
-}
-
-button{
-padding:14px 18px;
-border:0;
-border-radius:12px;
-background:#f97316;
-color:white;
-cursor:pointer;
-font-weight:bold;
-}
-
-.cards{
-display:grid;
-grid-template-columns:
-repeat(
-4,
-1fr
-);
-
-gap:14px;
-
-margin:30px 0;
-}
-
-.card{
-background:#111827;
-padding:24px;
-border-radius:18px;
-}
-
-.value{
-font-size:36px;
-font-weight:bold;
-margin-top:10px;
-}
-
-.green{
-color:#22c55e;
-}
-
-.orange{
-color:#f97316;
-}
-
-.grid{
-display:grid;
-grid-template-columns:2fr 1fr;
-gap:18px;
-}
-
-.panel{
-
-background:#111827;
-
-padding:22px;
-
-border-radius:18px;
-
-}
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-}
-
-td,
-th{
-
-padding:14px;
-
-border-bottom:
-1px solid
-#1f2937;
-
-}
-
-.rank{
-
-width:34px;
-
-height:34px;
-
-background:#facc15;
-
-color:black;
-
-display:inline-flex;
-
-justify-content:center;
-
-align-items:center;
-
-border-radius:50%;
-
-font-weight:bold;
-
-}
-
-.badge{
-
-border:
-1px solid
-#f97316;
-
-padding:
-4px 8px;
-
-border-radius:
-8px;
-
-font-size:
-12px;
-
-}
-
-.activity{
-
-display:flex;
-
-justify-content:
-space-between;
-
-padding:
-16px 0;
-
-border-bottom:
-1px solid
-#1f2937;
-
-}
-
-.small{
-
-color:
-#94a3b8;
-
-}
-
+*{box-sizing:border-box}
+body{margin:0;background:#07111f;color:#f8fafc;font-family:Arial}
+.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.sidebar{background:#091421;padding:24px;border-right:1px solid #1f2937}
+.logo{font-size:26px;font-weight:bold;margin-bottom:40px}
+.logo span{color:#f97316}
+.nav div{padding:16px;margin:10px 0;border-radius:12px}
+.active{background:#26170d;color:#f97316}
+.profile{background:#111827;padding:20px;border-radius:16px;margin-top:60px}
+.main{padding:30px}
+.top{display:flex;justify-content:space-between;align-items:center}
+button{padding:14px 18px;border:0;border-radius:12px;background:#f97316;color:white;cursor:pointer;font-weight:bold}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0}
+.card{background:#111827;padding:24px;border-radius:18px}
+.value{font-size:36px;font-weight:bold;margin-top:10px}
+.green{color:#22c55e}
+.orange{color:#f97316}
+.gold{color:#facc15}
+.silver{color:#cbd5e1}
+.bronze{color:#fb923c}
+.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
+.panel{background:#111827;padding:22px;border-radius:18px}
+table{width:100%;border-collapse:collapse}
+td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
+.rank{width:34px;height:34px;background:#facc15;color:black;display:inline-flex;justify-content:center;align-items:center;border-radius:50%;font-weight:bold}
+.badge{border:1px solid #f97316;padding:4px 8px;border-radius:8px;font-size:12px;color:#f97316}
+.activity{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid #1f2937}
+.small{color:#94a3b8}
 @media(max-width:900px){
-
-.app{
-grid-template-columns:
-1fr;
+.app{grid-template-columns:1fr}
+.sidebar{display:none}
+.cards{grid-template-columns:1fr 1fr}
+.grid{grid-template-columns:1fr}
 }
-
-.sidebar{
-display:none;
-}
-
-.cards{
-grid-template-columns:
-1fr 1fr;
-}
-
-.grid{
-grid-template-columns:
-1fr;
-}
-
-}
-
 </style>
-
 </head>
 
 <body>
-
 <div class="app">
 
 <aside class="sidebar">
-
-<div class="logo">
-
-🐗 JABALISES
-
-<br>
-
-<span>
-
-BIKERS
-
-</span>
-
-</div>
-
+<div class="logo">🐗 JABALISES<br><span>BIKERS</span></div>
 <div class="nav">
-
-<div class="active">
-
-🏆 Ranking
-
+<div class="active">🏆 Ranking</div>
+<div>🚴 Actividades</div>
+<div>📊 Estadísticas</div>
+<div>🎯 Desafíos</div>
 </div>
-
-<div>
-
-🚴 Actividades
-
-</div>
-
-<div>
-
-📊 Estadísticas
-
-</div>
-
-<div>
-
-🎯 Desafíos
-
-</div>
-
-</div>
-
 <div class="profile">
-
-<strong>
-
-Jabalí Master
-
-</strong>
-
-<br><br>
-
-🏆
-
-<span id="profilePoints">
-
-0
-
-</span>
-
-pts
-
-<br><br>
-
-<span class="badge">
-
-ADMIN
-
-</span>
-
+<strong>Jabalí Master</strong><br><br>
+🏆 <span id="profilePoints">0</span> pts<br><br>
+<span class="badge">ADMIN</span>
 </div>
-
 </aside>
 
 <main class="main">
-
 <div class="top">
-
 <div>
-
-<h1>
-
-Ranking semanal
-
-</h1>
-
-<p class="small">
-
-Temporada 2026
-
-</p>
-
+<h1>Ranking semanal</h1>
+<p class="small">Temporada 2026</p>
+</div>
+<button onclick="loadDashboard()">🔄 Actualizar</button>
 </div>
 
-<button
-onclick="loadDashboard()">
-
-🔄 Actualizar
-
-</button>
-
-</div>
-
-<p
-id="msg"
-class="small">
-
-Cargando...
-
-</p>
+<p id="msg" class="small">Cargando...</p>
 
 <div class="cards">
-
-<div class="card">
-
-🏆
-
-<div
-id="points"
-class="value green">
-
-0
-
-</div>
-
-</div>
-
-<div class="card">
-
-🚴
-
-<div
-id="activities"
-class="value">
-
-0
-
-</div>
-
-</div>
-
-<div class="card">
-
-📍
-
-<div
-id="km"
-class="value">
-
-0
-
-</div>
-
-</div>
-
-<div class="card">
-
-⛰️
-
-<div
-id="elevation"
-class="value orange">
-
-0
-
-</div>
-
-</div>
-
+<div class="card">🏆<div id="points" class="value green">0</div></div>
+<div class="card">🚴<div id="activities" class="value">0</div></div>
+<div class="card">📍<div id="km" class="value">0</div></div>
+<div class="card">⛰️<div id="elevation" class="value orange">0</div></div>
 </div>
 
 <div class="grid">
-
 <div>
-
 <div class="panel">
-
-<h2>
-
-🏆 CLASIFICACIÓN
-
-</h2>
-
+<h2>🏆 CLASIFICACIÓN</h2>
 <table>
-
-<tbody
-id="rankingRows">
-
-</tbody>
-
+<tbody id="rankingRows"></tbody>
 </table>
-
 </div>
 
-<div
-class="panel"
-style="margin-top:18px">
-
-<h2>
-
-🚴 ACTIVIDADES RECIENTES
-
-</h2>
-
-<div
-id="recentActivities">
-
+<div class="panel" style="margin-top:18px">
+<h2>🚴 ACTIVIDADES RECIENTES</h2>
+<div id="recentActivities"></div>
 </div>
-
-</div>
-
 </div>
 
 <div>
-
 <div class="panel">
-
-<h2>
-
-📈 TEMPORADA
-
-</h2>
-
-<div
-class="value green"
-id="seasonPoints">
-
-0
-
+<h2>🐗 PODIO JABALÍ</h2>
+<p class="gold">🥇 Gran Jabalí</p>
+<p class="silver">🥈 Colmillo de Plata</p>
+<p class="bronze">🥉 Pezuña de Hierro</p>
 </div>
 
+<div class="panel" style="margin-top:18px">
+<h2>📈 TEMPORADA</h2>
+<div class="value green" id="seasonPoints">0</div>
 </div>
-
 </div>
-
 </div>
-
 </main>
-
 </div>
 
 <script>
+const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
 
-const SUPABASE_URL =
-"https://bktwylokqyjuoernembh.supabase.co";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
-
-const supabaseClient =
-window.supabase.createClient(
-
-SUPABASE_URL,
-
-SUPABASE_KEY
-
-);
+function tituloPodio(pos){
+  if(pos === 1) return "🥇 Gran Jabalí";
+  if(pos === 2) return "🥈 Colmillo de Plata";
+  if(pos === 3) return "🥉 Pezuña de Hierro";
+  return "#" + pos;
+}
 
 async function loadDashboard(){
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"Actualizando...";
-
-const ranking =
-await supabaseClient
-
-.from(
-"weekly_ranking"
-)
-
-.select(
-"*"
-)
-
-.limit(
-1
-);
-
-const recent =
-await supabaseClient
-
-.from(
-"recent_activities"
-)
-
-.select(
-"*"
-);
-
-if(
-ranking.error
-){
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-ranking.error.message;
-
-return;
-
-}
-
-const r =
-ranking.data[0];
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"🟢 Datos cargados";
-
-document
-.getElementById(
-"points"
-)
-.innerText =
-Math.round(
-r.total_points
-);
-
-document
-.getElementById(
-"activities"
-)
-.innerText =
-r.activities;
-
-document
-.getElementById(
-"km"
-)
-.innerText =
-r.total_km;
-
-document
-.getElementById(
-"elevation"
-)
-.innerText =
-r.total_elevation;
-
-document
-.getElementById(
-"profilePoints"
-)
-.innerText =
-Math.round(
-r.total_points
-);
-
-document
-.getElementById(
-"seasonPoints"
-)
-.innerText =
-Math.round(
-r.total_points
-);
-
-document
-.getElementById(
-"rankingRows"
-)
-.innerHTML =
-
-`
-
-<tr>
-
-<td>
-
-<span class="rank">
-
-1
-
-</span>
-
-</td>
-
-<td>
-
-Jabalí Master
-
-</td>
-
-<td>
-
-🏆
-${r.total_points}
-
-</td>
-
-<td>
-
-${r.activities}
-
-</td>
-
-<td>
-
-${r.total_km}
-
-</td>
-
-<td>
-
-${r.total_elevation}
-
-</td>
-
-</tr>
-
-`;
-
-let html="";
-
-recent.data.forEach(
-(act)=>{
-
-html+=`
-
-<div
-class="activity">
-
-<div>
-
-<strong>
-
-${act.name}
-
-</strong>
-
-<br>
-
-<span class="small">
-
-${act.distance_km}
-km
-
-</span>
-
-</div>
-
-<div>
-
-${act.elevation_m}
-m+
-
-</div>
-
-<div
-class="green">
-
-🏆
-${act.points}
-
-</div>
-
-</div>
-
-`;
-
-}
-
-);
-
-document
-.getElementById(
-"recentActivities"
-)
-.innerHTML =
-html;
-
+  document.getElementById("msg").innerText = "Actualizando...";
+
+  const ranking = await supabaseClient.from("weekly_ranking").select("*").limit(1);
+  const recent = await supabaseClient.from("recent_activities").select("*");
+
+  if(ranking.error){
+    document.getElementById("msg").innerText = ranking.error.message;
+    return;
+  }
+
+  const r = ranking.data[0];
+
+  document.getElementById("msg").innerText = "🟢 Datos cargados";
+  document.getElementById("points").innerText = Math.round(r.total_points);
+  document.getElementById("activities").innerText = r.activities;
+  document.getElementById("km").innerText = r.total_km;
+  document.getElementById("elevation").innerText = r.total_elevation;
+  document.getElementById("profilePoints").innerText = Math.round(r.total_points);
+  document.getElementById("seasonPoints").innerText = Math.round(r.total_points);
+
+  document.getElementById("rankingRows").innerHTML =
+  `
+  <tr>
+    <td><span class="rank">1</span></td>
+    <td><strong>Jabalí Master</strong><br><span class="badge">${tituloPodio(1)}</span></td>
+    <td class="green"><strong>${Math.round(r.total_points)}</strong> pts</td>
+    <td>${r.activities}</td>
+    <td>${r.total_km} km</td>
+    <td>${r.total_elevation} m+</td>
+  </tr>
+  `;
+
+  let html = "";
+
+  if(recent.data){
+    recent.data.forEach((act)=>{
+      html += `
+      <div class="activity">
+        <div>
+          <strong>${act.name}</strong><br>
+          <span class="small">${act.distance_km} km</span>
+        </div>
+        <div>${act.elevation_m} m+</div>
+        <div class="green">🏆 ${act.points}</div>
+      </div>
+      `;
+    });
+  }
+
+  document.getElementById("recentActivities").innerHTML = html;
 }
 
 loadDashboard();
-
 </script>
-
 </body>
-
 </html>
