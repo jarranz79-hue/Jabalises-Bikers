@@ -9,222 +9,462 @@
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#07111f;color:#f8fafc;font-family:Arial}
-.app{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
-.sidebar{background:#091421;padding:24px;border-right:1px solid #1f2937}
-.logo{font-size:26px;font-weight:bold;margin-bottom:40px}
-.logo span{color:#f97316}
-.nav div{padding:16px;margin:10px 0;border-radius:12px}
-.active{background:#26170d;color:#f97316}
-.profile{background:#111827;padding:20px;border-radius:16px;margin-top:60px}
-.main{padding:30px}
-.top{display:flex;justify-content:space-between;align-items:center}
-button{padding:14px 18px;border:0;border-radius:12px;background:#f97316;color:white;cursor:pointer;font-weight:bold}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0}
-.card,.panel{background:#111827;padding:22px;border-radius:18px}
-.value{font-size:36px;font-weight:bold;margin-top:10px}
-.green{color:#22c55e}.orange{color:#f97316}.gold{color:#facc15}.silver{color:#cbd5e1}.bronze{color:#fb923c}
-.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}
-.podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;align-items:end;margin-bottom:20px}
-.podium-card{background:#111827;border:1px solid #1f2937;border-radius:22px;padding:20px;text-align:center}
-.podium-card.first{border:2px solid #facc15;box-shadow:0 0 25px rgba(250,204,21,.25);transform:scale(1.05)}
-.avatar{width:64px;height:64px;border-radius:50%;background:#f97316;margin:12px auto;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold}
-.title{font-weight:bold;margin:8px 0}
-table{width:100%;border-collapse:collapse}
-td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
-.rank{width:34px;height:34px;background:#facc15;color:black;display:inline-flex;justify-content:center;align-items:center;border-radius:50%;font-weight:bold}
-.badge{border:1px solid #f97316;padding:4px 8px;border-radius:8px;font-size:12px;color:#f97316}
-.activity{display:flex;justify-content:space-between;padding:16px 0;border-bottom:1px solid #1f2937}
-.small{color:#94a3b8}
+
+.app{
+display:grid;
+grid-template-columns:260px 1fr;
+min-height:100vh;
+}
+
+.sidebar{
+background:#091421;
+padding:24px;
+border-right:1px solid #1f2937;
+}
+
+.logo{
+font-size:28px;
+font-weight:bold;
+margin-bottom:40px;
+}
+
+.logo span{
+color:#f97316;
+}
+
+.nav div{
+padding:16px;
+margin:10px 0;
+border-radius:12px;
+}
+
+.active{
+background:#26170d;
+color:#f97316;
+}
+
+.profile{
+background:#111827;
+border-radius:22px;
+padding:22px;
+margin-top:40px;
+text-align:center;
+}
+
+.avatar{
+width:90px;
+height:90px;
+border-radius:50%;
+margin:auto;
+display:flex;
+align-items:center;
+justify-content:center;
+font-size:38px;
+font-weight:bold;
+background:
+linear-gradient(
+135deg,
+#f97316,
+#facc15
+);
+color:#111827;
+}
+
+.badge{
+margin-top:12px;
+padding:8px 12px;
+border-radius:999px;
+display:inline-block;
+border:1px solid #f97316;
+color:#f97316;
+}
+
+.level{
+font-size:30px;
+font-weight:bold;
+color:#22c55e;
+margin-top:10px;
+}
+
+.points{
+font-size:22px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.main{
+padding:30px;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+button{
+background:#f97316;
+color:white;
+border:0;
+padding:14px 18px;
+border-radius:12px;
+cursor:pointer;
+font-weight:bold;
+}
+
+.hero{
+background:#111827;
+padding:30px;
+border-radius:22px;
+}
+
+.hero h1{
+margin:0;
+font-size:48px;
+}
+
+.small{
+color:#94a3b8;
+}
+
 @media(max-width:900px){
-.app{grid-template-columns:1fr}
-.sidebar{display:none}
-.cards{grid-template-columns:1fr 1fr}
-.grid,.podium{grid-template-columns:1fr}
-.podium-card.first{transform:none}
+
+.app{
+grid-template-columns:1fr;
+}
+
+.sidebar{
+display:none;
+}
+
 }
 </style>
 </head>
 
 <body>
+
 <div class="app">
 
 <aside class="sidebar">
-<div class="logo">🐗 JABALISES<br><span>BIKERS</span></div>
+
+<div class="logo">
+
+🐗 JABALISES
+
+<br>
+
+<span>
+
+BIKERS
+
+</span>
+
+</div>
+
 <div class="nav">
-<div class="active">🏆 Ranking</div>
-<div>🚴 Actividades</div>
-<div>📊 Estadísticas</div>
-<div>🎯 Desafíos</div>
+
+<div class="active">
+
+🏆 Ranking
+
 </div>
+
+<div>
+
+🚴 Actividades
+
+</div>
+
+<div>
+
+📊 Estadísticas
+
+</div>
+
+<div>
+
+🎯 Desafíos
+
+</div>
+
+</div>
+
 <div class="profile">
-<strong>Jabalí Master</strong><br><br>
-🏆 <span id="profilePoints">0</span> pts<br><br>
-<span class="badge">ADMIN</span>
+
+<div
+id="avatar"
+class="avatar">
+
+J
+
 </div>
+
+<h2
+id="displayName">
+
+Jabalí
+
+</h2>
+
+<div
+id="badge"
+class="badge">
+
+Gran Jabalí
+
+</div>
+
+<div
+id="level"
+class="level">
+
+Nivel 1
+
+</div>
+
+<div
+id="totalPoints"
+class="points">
+
+0 pts
+
+</div>
+
+</div>
+
 </aside>
 
 <main class="main">
+
 <div class="top">
-<div>
-<h1>Ranking semanal</h1>
-<p class="small">Temporada 2026</p>
-</div>
-<button onclick="loadDashboard()">🔄 Actualizar</button>
-</div>
-
-<p id="msg" class="small">Cargando...</p>
-
-<div class="cards">
-<div class="card">🏆<div id="points" class="value green">0</div><p class="small">puntos líder</p></div>
-<div class="card">🚴<div id="activities" class="value">0</div><p class="small">salidas</p></div>
-<div class="card">📍<div id="km" class="value">0</div><p class="small">kilómetros</p></div>
-<div class="card">⛰️<div id="elevation" class="value orange">0</div><p class="small">desnivel +</p></div>
-</div>
-
-<div class="panel">
-<h2>🐗 PODIO JABALÍ</h2>
-<div id="podiumCards" class="podium"></div>
-</div>
-
-<div class="grid" style="margin-top:18px">
-<div>
-<div class="panel">
-<h2>🏆 CLASIFICACIÓN</h2>
-<table>
-<thead>
-<tr>
-<th>POS.</th><th>JABALÍ</th><th>PUNTOS</th><th>SALIDAS</th><th>KM</th><th>DESNIVEL</th>
-</tr>
-</thead>
-<tbody id="rankingRows"></tbody>
-</table>
-</div>
-
-<div class="panel" style="margin-top:18px">
-<h2>🚴 ACTIVIDADES RECIENTES</h2>
-<div id="recentActivities"></div>
-</div>
-</div>
 
 <div>
-<div class="panel">
-<h2>📈 TEMPORADA</h2>
-<div class="value green" id="seasonPoints">0</div>
-<p class="small">puntos del líder</p>
+
+<h1>
+
+Dashboard
+
+</h1>
+
+<p class="small">
+
+Perfil Jabalí
+
+</p>
+
 </div>
+
+<button
+onclick="loadProfile()">
+
+🔄 Actualizar
+
+</button>
+
 </div>
+
+<div
+class="hero">
+
+<h1>
+
+🐗 Bienvenido
+
+</h1>
+
+<p
+id="welcome"
+class="small">
+
+Cargando perfil...
+
+</p>
+
 </div>
+
 </main>
+
 </div>
 
 <script>
-const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const SUPABASE_URL =
+"https://bktwylokqyjuoernembh.supabase.co";
 
-function tituloPodio(pos){
-  if(pos === 1) return "🥇 Gran Jabalí";
-  if(pos === 2) return "🥈 Colmillo de Plata";
-  if(pos === 3) return "🥉 Pezuña de Hierro";
-  return "#" + pos;
+const SUPABASE_KEY =
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
+
+const supabase =
+window.supabase.createClient(
+SUPABASE_URL,
+SUPABASE_KEY
+);
+
+function initial(name){
+
+return (
+name ||
+"J"
+)
+
+.charAt(
+0
+)
+
+.toUpperCase();
+
 }
 
-function clasePodio(pos){
-  if(pos === 1) return "gold";
-  if(pos === 2) return "silver";
-  if(pos === 3) return "bronze";
-  return "";
+async function loadProfile(){
+
+document
+.getElementById(
+"welcome"
+)
+
+.innerText =
+
+"Cargando perfil...";
+
+const {
+
+data,
+
+error
+
 }
 
-function inicial(nombre){
-  return (nombre || "J").trim().charAt(0).toUpperCase();
+=
+
+await supabase
+
+.from(
+"profile_dashboard"
+)
+
+.select(
+"*"
+)
+
+.limit(
+1
+);
+
+if(
+error
+){
+
+document
+.getElementById(
+"welcome"
+)
+
+.innerText =
+
+error.message;
+
+return;
+
 }
 
-async function loadDashboard(){
-  document.getElementById("msg").innerText = "Actualizando...";
+if(
+!data.length
+){
 
-  const leaderboard = await supabaseClient.from("leaderboard").select("*");
-  const recent = await supabaseClient.from("recent_activities").select("*");
+document
+.getElementById(
+"welcome"
+)
 
-  if(leaderboard.error){
-    document.getElementById("msg").innerText = leaderboard.error.message;
-    return;
-  }
+.innerText =
 
-  if(!leaderboard.data || leaderboard.data.length === 0){
-    document.getElementById("msg").innerText = "No hay ranking todavía";
-    return;
-  }
+"Perfil vacío";
 
-  const lider = leaderboard.data[0];
+return;
 
-  document.getElementById("msg").innerText = "🟢 Datos cargados";
-  document.getElementById("points").innerText = Math.round(lider.total_points);
-  document.getElementById("activities").innerText = lider.activities;
-  document.getElementById("km").innerText = lider.total_km;
-  document.getElementById("elevation").innerText = lider.total_elevation;
-  document.getElementById("profilePoints").innerText = Math.round(lider.total_points);
-  document.getElementById("seasonPoints").innerText = Math.round(lider.total_points);
-
-  let rows = "";
-  let podium = "";
-
-  const podioOrden = [
-    leaderboard.data.find(x => x.position === 2),
-    leaderboard.data.find(x => x.position === 1),
-    leaderboard.data.find(x => x.position === 3)
-  ].filter(Boolean);
-
-  podioOrden.forEach((r)=>{
-    podium += `
-    <div class="podium-card ${r.position === 1 ? "first" : ""}">
-      <div class="${clasePodio(r.position)}">${tituloPodio(r.position)}</div>
-      <div class="avatar">${inicial(r.profile_name)}</div>
-      <h3>${r.profile_name}</h3>
-      <div class="value ${clasePodio(r.position)}">${Math.round(r.total_points)}</div>
-      <p class="small">${r.activities} salidas · ${r.total_km} km</p>
-    </div>
-    `;
-  });
-
-  leaderboard.data.forEach((r)=>{
-    rows += `
-    <tr>
-      <td><span class="rank">${r.position}</span></td>
-      <td><strong>${r.profile_name}</strong><br><span class="badge">${tituloPodio(r.position)}</span></td>
-      <td class="green"><strong>${Math.round(r.total_points)}</strong> pts</td>
-      <td>${r.activities}</td>
-      <td>${r.total_km} km</td>
-      <td>${r.total_elevation} m+</td>
-    </tr>
-    `;
-  });
-
-  document.getElementById("podiumCards").innerHTML = podium;
-  document.getElementById("rankingRows").innerHTML = rows;
-
-  let html = "";
-
-  if(recent.data){
-    recent.data.forEach((act)=>{
-      html += `
-      <div class="activity">
-        <div>
-          <strong>${act.name}</strong><br>
-          <span class="small">${act.distance_km} km</span>
-        </div>
-        <div>${act.elevation_m} m+</div>
-        <div class="green">🏆 ${act.points}</div>
-      </div>
-      `;
-    });
-  }
-
-  document.getElementById("recentActivities").innerHTML = html;
 }
 
-loadDashboard();
+const p =
+data[0];
+
+document
+.getElementById(
+"avatar"
+)
+
+.innerText =
+
+initial(
+p.display_name
+);
+
+document
+.getElementById(
+"displayName"
+)
+
+.innerText =
+
+"🐗 " +
+
+p.display_name;
+
+document
+.getElementById(
+"badge"
+)
+
+.innerText =
+
+"🏆 " +
+
+p.badge;
+
+document
+.getElementById(
+"level"
+)
+
+.innerText =
+
+"🔥 Nivel " +
+
+p.level;
+
+document
+.getElementById(
+"totalPoints"
+)
+
+.innerText =
+
+"⭐ " +
+
+p.total_points +
+
+" pts";
+
+document
+.getElementById(
+"welcome"
+)
+
+.innerText =
+
+"Bienvenido " +
+
+p.display_name +
+
+" · " +
+
+p.badge;
+
+}
+
+loadProfile();
+
 </script>
+
 </body>
+
 </html>
