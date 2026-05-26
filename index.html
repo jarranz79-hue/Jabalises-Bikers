@@ -3,332 +3,110 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
 <title>Jabalises Bikers</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
-body{
-margin:0;
-padding:24px;
-background:#07111f;
-color:white;
-font-family:Arial;
-}
-
-h1{
-color:#ff7a1a;
-}
-
-.card{
-background:#10172f;
-padding:24px;
-border-radius:18px;
-margin-top:18px;
-}
-
-.grid{
-display:grid;
-grid-template-columns:1fr 1fr;
-gap:14px;
-}
-
-.value{
-font-size:48px;
-font-weight:bold;
-color:#22c55e;
-}
-
-button{
-background:#ff7a1a;
-color:white;
-border:0;
-padding:14px 20px;
-border-radius:12px;
-}
-
-.small{
-color:#94a3b8;
-}
-
-#profile{
-line-height:1.8;
-font-size:20px;
-}
-
+body{background:#07111f;color:white;font-family:Arial;padding:24px}
+h1{color:#f97316}
+.card{background:#111827;padding:22px;border-radius:18px;margin-top:18px}
+.value{font-size:42px;color:#22c55e;font-weight:bold}
+button{background:#f97316;color:white;border:0;border-radius:12px;padding:14px 20px}
+pre{white-space:pre-wrap;color:#94a3b8}
 </style>
-
 </head>
 
 <body>
 
-<h1>
+<h1>🐗 Jabalises Bikers</h1>
 
-🐗 Jabalises Bikers
-
-</h1>
-
-<p id="status">
-
-Preparado
-
-</p>
-
-<button onclick="loadDashboard()">
-
-🔄 Actualizar
-
-</button>
+<button onclick="loadDashboard()">🔄 Actualizar</button>
 
 <div class="card">
-
-<h2>
-
-👤 Perfil
-
-</h2>
-
-<div id="profile">
-
-Esperando perfil...
-
-</div>
-
-</div>
-
-<div class="grid">
-
-<div class="card">
-
-🏆
-
-<div id="points" class="value">
-
-0
-
-</div>
-
-<p>
-
-Puntos
-
-</p>
-
+<h2>Estado</h2>
+<pre id="status">Preparado</pre>
 </div>
 
 <div class="card">
-
-🚴
-
-<div id="activities" class="value">
-
-0
-
-</div>
-
-<p>
-
-Salidas
-
-</p>
-
+<h2>👤 Perfil</h2>
+<div id="profile">Esperando perfil...</div>
 </div>
 
 <div class="card">
-
-📍
-
-<div id="km" class="value">
-
-0
-
-</div>
-
-<p>
-
-Kilómetros
-
-</p>
-
-</div>
-
-<div class="card">
-
-⛰️
-
-<div id="elevation" class="value">
-
-0
-
-</div>
-
-<p>
-
-Desnivel
-
-</p>
-
-</div>
-
+<h2>🏆 Ranking semanal</h2>
+<p>Puntos</p><div id="points" class="value">0</div>
+<p>Salidas</p><div id="activities" class="value">0</div>
+<p>Kilómetros</p><div id="km" class="value">0</div>
+<p>Desnivel</p><div id="elevation" class="value">0</div>
 </div>
 
 <script>
+const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
 
-const SUPABASE_URL=
-"https://bktwylokqyjuoernembh.supabase.co";
+async function readTable(table){
+  const response = await fetch(
+    SUPABASE_URL + "/rest/v1/" + table + "?select=*",
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+      }
+    }
+  );
 
-const SUPABASE_KEY=
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
-";
+  const text = await response.text();
 
-const supabase=
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
-);
+  if(!response.ok){
+    throw new Error(table + " → " + text);
+  }
+
+  return JSON.parse(text);
+}
 
 async function loadDashboard(){
+  const status = document.getElementById("status");
 
-try{
+  try{
+    status.innerText = "1/2 Leyendo profile_dashboard...";
 
-document.getElementById(
-"status"
-).innerHTML=
-"Cargando perfil...";
+    const profiles = await readTable("profile_dashboard");
 
-const profile=
-await supabase
+    status.innerText += "\nPerfil recibido: " + JSON.stringify(profiles);
 
-.from(
-"profile_dashboard"
-)
+    if(profiles.length > 0){
+      const p = profiles[0];
 
-.select(
-"*"
-)
+      document.getElementById("profile").innerHTML =
+        "🐗 <b>" + p.display_name + "</b><br>" +
+        "🏆 " + p.badge + "<br>" +
+        "🔥 Nivel " + p.level + "<br>" +
+        "⭐ " + p.total_points + " pts";
+    }
 
-.limit(
-1
-);
+    status.innerText += "\n\n2/2 Leyendo leaderboard...";
 
-if(
-profile.error
-){
+    const ranking = await readTable("leaderboard");
 
-throw profile.error;
+    status.innerText += "\nRanking recibido: " + JSON.stringify(ranking);
 
-}
+    if(ranking.length > 0){
+      const r = ranking[0];
 
-if(
-profile.data.length
-){
+      document.getElementById("points").innerText = r.total_points || 0;
+      document.getElementById("activities").innerText = r.activities || 0;
+      document.getElementById("km").innerText = Math.round(r.total_km || 0);
+      document.getElementById("elevation").innerText = Math.round(r.total_elevation || 0);
+    }
 
-const p=
-profile.data[0];
+    status.innerText += "\n\n🟢 Dashboard cargado";
+  }
 
-document.getElementById(
-"profile"
-).innerHTML=
-
-"🐗 <b>"+p.display_name+"</b><br>"+
-
-"🏆 "+p.badge+"<br>"+
-
-"🔥 Nivel "+p.level+"<br>"+
-
-"⭐ "+p.total_points+" pts";
-
-}
-
-document.getElementById(
-"status"
-).innerHTML=
-
-"Cargando ranking...";
-
-const ranking=
-await supabase
-
-.from(
-"leaderboard"
-)
-
-.select(
-"*"
-)
-
-.limit(
-1
-);
-
-if(
-ranking.error
-){
-
-throw ranking.error;
-
-}
-
-if(
-ranking.data.length
-){
-
-const r=
-ranking.data[0];
-
-document.getElementById(
-"points"
-).innerText=
-r.total_points;
-
-document.getElementById(
-"activities"
-).innerText=
-r.activities;
-
-document.getElementById(
-"km"
-).innerText=
-Math.round(
-r.total_km
-);
-
-document.getElementById(
-"elevation"
-).innerText=
-Math.round(
-r.total_elevation
-);
-
-}
-
-document.getElementById(
-"status"
-).innerHTML=
-
-"🟢 Dashboard cargado";
-
-}
-
-catch(e){
-
-document.getElementById(
-"status"
-).innerHTML=
-
-"❌ "+
-e.message;
-
-}
-
+  catch(error){
+    status.innerText = "❌ ERROR:\n" + error.message;
+  }
 }
 
 loadDashboard();
-
 </script>
 
 </body>
-
 </html>
