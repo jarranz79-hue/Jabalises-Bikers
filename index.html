@@ -3,27 +3,29 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
 <title>Jabalises Bikers</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
+
 body{
 margin:0;
 padding:24px;
-background:#061326;
+background:#07111f;
 color:white;
 font-family:Arial;
 }
 
 h1{
-color:#ff7b1c;
+color:#ff7a1a;
 }
 
 .card{
-background:#101a35;
+background:#10172f;
 padding:24px;
-border-radius:20px;
+border-radius:18px;
 margin-top:18px;
 }
 
@@ -39,29 +41,34 @@ font-weight:bold;
 color:#22c55e;
 }
 
-.small{
-color:#9ca3af;
-}
-
 button{
-background:#ff7b1c;
+background:#ff7a1a;
 color:white;
 border:0;
-padding:14px 22px;
-border-radius:14px;
-font-size:16px;
+padding:14px 20px;
+border-radius:12px;
+}
+
+.small{
+color:#94a3b8;
 }
 
 #profile{
-font-size:22px;
 line-height:1.8;
+font-size:20px;
 }
+
 </style>
+
 </head>
 
 <body>
 
-<h1>🐗 Jabalises Bikers</h1>
+<h1>
+
+🐗 Jabalises Bikers
+
+</h1>
 
 <p id="status">
 
@@ -69,7 +76,7 @@ Preparado
 
 </p>
 
-<button onclick="loadRanking(); alert('función llamada')">
+<button onclick="loadDashboard()">
 
 🔄 Actualizar
 
@@ -85,7 +92,7 @@ Preparado
 
 <div id="profile">
 
-Esperando...
+Esperando perfil...
 
 </div>
 
@@ -103,7 +110,7 @@ Esperando...
 
 </div>
 
-<p class="small">
+<p>
 
 Puntos
 
@@ -121,7 +128,7 @@ Puntos
 
 </div>
 
-<p class="small">
+<p>
 
 Salidas
 
@@ -139,7 +146,7 @@ Salidas
 
 </div>
 
-<p class="small">
+<p>
 
 Kilómetros
 
@@ -157,7 +164,7 @@ Kilómetros
 
 </div>
 
-<p class="small">
+<p>
 
 Desnivel
 
@@ -169,9 +176,11 @@ Desnivel
 
 <script>
 
-const SUPABASE_URL="https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_URL=
+"https://bktwylokqyjuoernembh.supabase.co";
 
-const SUPABASE_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
+const SUPABASE_KEY=
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
 ";
 
 const supabase=
@@ -180,20 +189,20 @@ SUPABASE_URL,
 SUPABASE_KEY
 );
 
-async function loadRanking(){
+async function loadDashboard(){
 
 try{
 
 document.getElementById(
 "status"
 ).innerHTML=
-"Cargando ranking...";
+"Cargando perfil...";
 
-const result=
+const profile=
 await supabase
 
 .from(
-"rankings"
+"profile_dashboard"
 )
 
 .select(
@@ -205,62 +214,85 @@ await supabase
 );
 
 if(
-result.error
+profile.error
 ){
 
-throw result.error;
+throw profile.error;
 
 }
 
 if(
-!result.data.length
+profile.data.length
 ){
 
-document.getElementById(
-"status"
-).innerHTML=
-"Sin datos";
-
-return;
-
-}
-
-const r=
-result.data[0];
+const p=
+profile.data[0];
 
 document.getElementById(
 "profile"
 ).innerHTML=
 
-"🐗 <b>"+(
-r.profile_name
-||
-"Jabalí"
+"🐗 <b>"+p.display_name+"</b><br>"+
+
+"🏆 "+p.badge+"<br>"+
+
+"🔥 Nivel "+p.level+"<br>"+
+
+"⭐ "+p.total_points+" pts";
+
+}
+
+document.getElementById(
+"status"
+).innerHTML=
+
+"Cargando ranking...";
+
+const ranking=
+await supabase
+
+.from(
+"leaderboard"
 )
 
-+"</b>";
+.select(
+"*"
+)
+
+.limit(
+1
+);
+
+if(
+ranking.error
+){
+
+throw ranking.error;
+
+}
+
+if(
+ranking.data.length
+){
+
+const r=
+ranking.data[0];
 
 document.getElementById(
 "points"
 ).innerText=
-r.total_points
-||
-0;
+r.total_points;
 
 document.getElementById(
 "activities"
 ).innerText=
-r.activities
-||
-0;
+r.activities;
 
 document.getElementById(
 "km"
 ).innerText=
 Math.round(
 r.total_km
-||
-0
 );
 
 document.getElementById(
@@ -268,15 +300,15 @@ document.getElementById(
 ).innerText=
 Math.round(
 r.total_elevation
-||
-0
 );
+
+}
 
 document.getElementById(
 "status"
 ).innerHTML=
 
-"🟢 Ranking cargado";
+"🟢 Dashboard cargado";
 
 }
 
@@ -286,17 +318,17 @@ document.getElementById(
 "status"
 ).innerHTML=
 
-"❌ "
-+
+"❌ "+
 e.message;
 
 }
 
 }
 
-loadRanking();
+loadDashboard();
 
 </script>
 
 </body>
+
 </html>
