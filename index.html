@@ -5,20 +5,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
 body{margin:0;padding:24px;background:#07111f;color:white;font-family:Arial}
 h1{color:#f97316}
 .card{background:#111827;padding:22px;border-radius:20px;margin-top:18px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-.value{font-size:38px;font-weight:bold;color:#22c55e}
+.value{font-size:40px;color:#22c55e;font-weight:bold}
 .small{color:#94a3b8}
-button{background:#f97316;color:white;border:0;border-radius:12px;padding:14px 20px;font-weight:bold}
-.activity{border-bottom:1px solid #1f2937;padding:14px 0}
-@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr)}}
+button{background:#f97316;color:white;border:0;border-radius:12px;padding:14px 20px}
 </style>
 </head>
-
 <body>
 
 <h1>🐗 Jabalises Bikers</h1>
@@ -26,20 +21,15 @@ button{background:#f97316;color:white;border:0;border-radius:12px;padding:14px 2
 <button onclick="loadApp()">🔄 Actualizar</button>
 
 <div class="card">
-<h2>👤 Perfil</h2>
-<div id="profile">Cargando perfil...</div>
-</div>
-
-<div class="grid">
-<div class="card">🏆<div id="points" class="value">0</div><p class="small">Puntos</p></div>
-<div class="card">🚴<div id="activities" class="value">0</div><p class="small">Salidas</p></div>
-<div class="card">📍<div id="km" class="value">0</div><p class="small">Kilómetros</p></div>
-<div class="card">⛰️<div id="elevation" class="value">0</div><p class="small">Desnivel</p></div>
-</div>
-
-<div class="card">
-<h2>🚴 Actividades recientes</h2>
-<div id="recent"></div>
+<h2>🏆 Ranking semanal</h2>
+<p>Puntos</p>
+<div id="points" class="value">0</div>
+<p>Salidas</p>
+<div id="activities" class="value">0</div>
+<p>Kilómetros</p>
+<div id="km" class="value">0</div>
+<p>Desnivel</p>
+<div id="elevation" class="value">0</div>
 </div>
 
 <script>
@@ -52,80 +42,33 @@ async function loadApp(){
   const status = document.getElementById("status");
 
   try{
-    status.innerText = "Cargando perfil...";
-
-    const profileResult = await supabase
-      .from("profile_dashboard")
-      .select("*")
-      .limit(1);
-
-    if(profileResult.error){
-      throw new Error("Perfil: " + profileResult.error.message);
-    }
-
-    if(profileResult.data && profileResult.data.length > 0){
-      const p = profileResult.data[0];
-
-      document.getElementById("profile").innerHTML =
-        "🐗 <strong>" + (p.display_name || "Jabalí") + "</strong><br>" +
-        "🏆 " + (p.badge || "Sin insignia") + "<br>" +
-        "🔥 Nivel " + (p.level || 1) + "<br>" +
-        "⭐ " + (p.total_points || 0) + " pts";
-    }
-
     status.innerText = "Cargando ranking...";
 
-    const rankingResult = await supabase
+    const result = await supabase
       .from("weekly_ranking")
       .select("*")
       .limit(1);
 
-    if(rankingResult.error){
-      throw new Error("Ranking: " + rankingResult.error.message);
+    if(result.error){
+      status.innerText = "❌ " + result.error.message;
+      return;
     }
 
-    if(rankingResult.data && rankingResult.data.length > 0){
-      const r = rankingResult.data[0];
-
-      document.getElementById("points").innerText = Math.round(r.total_points || 0);
-      document.getElementById("activities").innerText = r.activities || 0;
-      document.getElementById("km").innerText = r.total_km || 0;
-      document.getElementById("elevation").innerText = r.total_elevation || 0;
+    if(!result.data || result.data.length === 0){
+      status.innerText = "No hay datos";
+      return;
     }
 
-    status.innerText = "Cargando actividades...";
+    const r = result.data[0];
 
-    const recentResult = await supabase
-      .from("recent_activities")
-      .select("*");
+    document.getElementById("points").innerText = Math.round(r.total_points || 0);
+    document.getElementById("activities").innerText = r.activities || 0;
+    document.getElementById("km").innerText = r.total_km || 0;
+    document.getElementById("elevation").innerText = r.total_elevation || 0;
 
-    if(recentResult.error){
-      throw new Error("Actividades: " + recentResult.error.message);
-    }
-
-    let html = "";
-
-    if(recentResult.data){
-      recentResult.data.forEach((a)=>{
-        html +=
-          "<div class='activity'>" +
-          "<strong>" + (a.name || "Actividad") + "</strong><br>" +
-          "<span class='small'>" +
-          (a.distance_km || 0) + " km · " +
-          (a.elevation_m || 0) + " m+ · " +
-          "🏆 " + (a.points || 0) +
-          "</span>" +
-          "</div>";
-      });
-    }
-
-    document.getElementById("recent").innerHTML = html;
-
-    status.innerText = "🟢 App cargada correctamente";
-  }
-
-  catch(error){
-    status.innerText = "❌ " + error.message;
+    status.innerText = "🟢 Ranking cargado";
+  }catch(e){
+    status.innerText = "❌ " + e.message;
   }
 }
 
