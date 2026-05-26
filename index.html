@@ -1,278 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
-
 <head>
-
 <meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,initial-scale=1">
-
-<title>
-Jabalises Bikers
-</title>
-
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jabalises Bikers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <style>
-
-body{
-background:#111827;
-color:white;
-font-family:Arial;
-padding:30px;
-text-align:center;
-}
-
-.card{
-background:#1f2937;
-max-width:900px;
-margin:auto;
-padding:25px;
-border-radius:18px;
-}
-
-button{
-padding:14px;
-border-radius:10px;
-border:0;
-background:#fc4c02;
-color:white;
-cursor:pointer;
-font-weight:bold;
-}
-
-.box{
-background:#374151;
-padding:18px;
-margin:12px;
-border-radius:12px;
-}
-
-.points{
-font-size:40px;
-color:#22c55e;
-font-weight:bold;
-}
-
-.small{
-color:#9ca3af;
-}
-
-.grid{
-display:grid;
-grid-template-columns:
-repeat(
-auto-fit,
-minmax(
-180px,
-1fr
-)
-);
-
-gap:10px;
-
-}
-
+body{background:#111827;color:white;font-family:Arial;padding:30px;text-align:center}
+.card{background:#1f2937;max-width:900px;margin:auto;padding:25px;border-radius:18px}
+button{padding:14px;border-radius:10px;border:0;background:#fc4c02;color:white;cursor:pointer;font-weight:bold}
+.box{background:#374151;padding:18px;margin:12px;border-radius:12px}
+.points{font-size:40px;color:#22c55e;font-weight:bold}
+.small{color:#9ca3af;white-space:pre-wrap}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
 </style>
-
 </head>
 
 <body>
-
 <div class="card">
+<h1>🏔️ Jabalises Bikers</h1>
+<p>Ranking semanal</p>
 
-<h1>
-🏔️ Jabalises Bikers
-</h1>
+<button onclick="loadRanking()">🏆 Actualizar ranking</button>
 
-<p>
-Ranking semanal
-</p>
-
-<button
-onclick="loadRanking()">
-
-🏆 Actualizar ranking
-
-</button>
-
-<p
-id="msg"
-class="small">
-
-Preparado
-
-</p>
-
-<div
-id="ranking">
-
-</div>
-
+<p id="msg" class="small">Preparado</p>
+<div id="ranking"></div>
 </div>
 
 <script>
+const SUPABASE_URL = "https://bktwylokqyjuoernembh.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM";
 
-const SUPABASE_URL =
-"https://bktwylokqyjuoernembh.supabase.co";
-
-const SUPABASE_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
-";
-
-const supabase =
-window.supabase.createClient(
-SUPABASE_URL,
-SUPABASE_KEY
+const supabaseClient = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
 );
 
 async function loadRanking(){
+  document.getElementById("msg").innerText = "Cargando ranking...";
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"Cargando ranking...";
+  try{
+    const { data, error } = await supabaseClient
+      .from("weekly_ranking")
+      .select("*")
+      .limit(1);
 
-const {
-data,
-error
-}
-=
-await supabase
+    if(error){
+      document.getElementById("msg").innerText =
+      "❌ Error Supabase:\n" + JSON.stringify(error);
+      return;
+    }
 
-.from(
-"weekly_ranking"
-)
+    if(!data || data.length === 0){
+      document.getElementById("msg").innerText =
+      "⚠️ No hay datos en weekly_ranking";
+      return;
+    }
 
-.select(
-"*"
-)
+    const r = data[0];
 
-.limit(
-1
-);
+    document.getElementById("msg").innerText =
+    "✅ Ranking actualizado";
 
-if(error){
+    document.getElementById("ranking").innerHTML =
+    `
+    <div class="box">
+      <h2>🏆 Semana ${r.week}</h2>
+      <div class="points">${r.total_points}</div>
+      <p>puntos</p>
+    </div>
 
-document
-.getElementById(
-"msg"
-)
-.innerText =
-error.message;
-
-return;
-
-}
-
-if(
-!data.length
-){
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"No hay datos";
-
-return;
-
-}
-
-const r =
-data[0];
-
-document
-.getElementById(
-"msg"
-)
-.innerText =
-"Ranking actualizado";
-
-document
-.getElementById(
-"ranking"
-)
-.innerHTML =
-
-`
-
-<div class="box">
-
-<h2>
-
-🏆 Semana ${r.week}
-
-</h2>
-
-<div class="points">
-
-${r.total_points}
-
-</div>
-
-<p>
-
-puntos
-
-</p>
-
-</div>
-
-<div class="grid">
-
-<div class="box">
-
-🚴
-
-<br>
-
-${r.activities}
-
-<br>
-
-salidas
-
-</div>
-
-<div class="box">
-
-📍
-
-<br>
-
-${r.total_km}
-
-km
-
-</div>
-
-<div class="box">
-
-⛰️
-
-<br>
-
-${r.total_elevation}
-
-m+
-
-</div>
-
-</div>
-
-`;
-
+    <div class="grid">
+      <div class="box">🚴<br>${r.activities}<br>salidas</div>
+      <div class="box">📍<br>${r.total_km}<br>km</div>
+      <div class="box">⛰️<br>${r.total_elevation}<br>m+</div>
+    </div>
+    `;
+  }catch(e){
+    document.getElementById("msg").innerText =
+    "❌ Error JavaScript:\n" + e.message;
+  }
 }
 
 loadRanking();
-
 </script>
-
 </body>
-
 </html>
