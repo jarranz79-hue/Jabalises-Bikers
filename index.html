@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:#07111f;color:#f8fafc;font-family:Arial}
@@ -84,6 +85,16 @@ td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 <div class="panel">
 <h2>🏆 CLASIFICACIÓN</h2>
 <table>
+<thead>
+<tr>
+<th>POS.</th>
+<th>JABALÍ</th>
+<th>PUNTOS</th>
+<th>SALIDAS</th>
+<th>KM</th>
+<th>DESNIVEL</th>
+</tr>
+</thead>
 <tbody id="rankingRows"></tbody>
 </table>
 </div>
@@ -97,14 +108,13 @@ td,th{padding:14px;border-bottom:1px solid #1f2937;text-align:left}
 <div>
 <div class="panel">
 <h2>🐗 PODIO JABALÍ</h2>
-<p class="gold">🥇 Gran Jabalí</p>
-<p class="silver">🥈 Colmillo de Plata</p>
-<p class="bronze">🥉 Pezuña de Hierro</p>
+<div id="podium"></div>
 </div>
 
 <div class="panel" style="margin-top:18px">
 <h2>📈 TEMPORADA</h2>
 <div class="value green" id="seasonPoints">0</div>
+<p class="small">puntos del líder</p>
 </div>
 </div>
 </div>
@@ -124,38 +134,75 @@ function tituloPodio(pos){
   return "#" + pos;
 }
 
+function clasePodio(pos){
+  if(pos === 1) return "gold";
+  if(pos === 2) return "silver";
+  if(pos === 3) return "bronze";
+  return "";
+}
+
 async function loadDashboard(){
   document.getElementById("msg").innerText = "Actualizando...";
 
-  const ranking = await supabaseClient.from("weekly_ranking").select("*").limit(1);
-  const recent = await supabaseClient.from("recent_activities").select("*");
+  const leaderboard = await supabaseClient
+    .from("leaderboard")
+    .select("*");
 
-  if(ranking.error){
-    document.getElementById("msg").innerText = ranking.error.message;
+  const recent = await supabaseClient
+    .from("recent_activities")
+    .select("*");
+
+  if(leaderboard.error){
+    document.getElementById("msg").innerText = leaderboard.error.message;
     return;
   }
 
-  const r = ranking.data[0];
+  if(!leaderboard.data || leaderboard.data.length === 0){
+    document.getElementById("msg").innerText = "No hay ranking todavía";
+    return;
+  }
+
+  const lider = leaderboard.data[0];
 
   document.getElementById("msg").innerText = "🟢 Datos cargados";
-  document.getElementById("points").innerText = Math.round(r.total_points);
-  document.getElementById("activities").innerText = r.activities;
-  document.getElementById("km").innerText = r.total_km;
-  document.getElementById("elevation").innerText = r.total_elevation;
-  document.getElementById("profilePoints").innerText = Math.round(r.total_points);
-  document.getElementById("seasonPoints").innerText = Math.round(r.total_points);
 
-  document.getElementById("rankingRows").innerHTML =
-  `
-  <tr>
-    <td><span class="rank">1</span></td>
-    <td><strong>Jabalí Master</strong><br><span class="badge">${tituloPodio(1)}</span></td>
-    <td class="green"><strong>${Math.round(r.total_points)}</strong> pts</td>
-    <td>${r.activities}</td>
-    <td>${r.total_km} km</td>
-    <td>${r.total_elevation} m+</td>
-  </tr>
-  `;
+  document.getElementById("points").innerText = Math.round(lider.total_points);
+  document.getElementById("activities").innerText = lider.activities;
+  document.getElementById("km").innerText = lider.total_km;
+  document.getElementById("elevation").innerText = lider.total_elevation;
+  document.getElementById("profilePoints").innerText = Math.round(lider.total_points);
+  document.getElementById("seasonPoints").innerText = Math.round(lider.total_points);
+
+  let rows = "";
+  let podium = "";
+
+  leaderboard.data.forEach((r)=>{
+    rows += `
+    <tr>
+      <td><span class="rank">${r.position}</span></td>
+      <td>
+        <strong>${r.profile_name}</strong><br>
+        <span class="badge ${clasePodio(r.position)}">${tituloPodio(r.position)}</span>
+      </td>
+      <td class="green"><strong>${Math.round(r.total_points)}</strong> pts</td>
+      <td>${r.activities}</td>
+      <td>${r.total_km} km</td>
+      <td>${r.total_elevation} m+</td>
+    </tr>
+    `;
+
+    if(r.position <= 3){
+      podium += `
+      <p class="${clasePodio(r.position)}">
+        ${tituloPodio(r.position)}<br>
+        <strong>${r.profile_name}</strong> — ${Math.round(r.total_points)} pts
+      </p>
+      `;
+    }
+  });
+
+  document.getElementById("rankingRows").innerHTML = rows;
+  document.getElementById("podium").innerHTML = podium;
 
   let html = "";
 
