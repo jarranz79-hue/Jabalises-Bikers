@@ -27,9 +27,12 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 .value{font-size:34px;font-weight:bold;margin-top:10px}
 .green{color:#22c55e}
 .orange{color:#f97316}
+.gold{color:#facc15}
+.silver{color:#cbd5e1}
+.bronze{color:#fb923c}
 .grid{display:grid;grid-template-columns:2fr 1fr;gap:18px;margin-top:20px}
 .activity{display:flex;justify-content:space-between;padding:14px 0;border-bottom:1px solid #1f2937}
-.small{color:#94a3b8;white-space:pre-wrap}
+.small{color:#94a3b8}
 @media(max-width:900px){
 .app{grid-template-columns:1fr}
 .sidebar{display:none}
@@ -67,19 +70,16 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 <div class="top">
 <div>
 <h1>Dashboard</h1>
-<p id="welcome" class="small">Cargando...</p>
+<p id="welcome" class="small">Cargando datos...</p>
 </div>
-
 <button onclick="loadDashboard()">🔄 Actualizar</button>
 </div>
 
-<p id="debug" class="small">Iniciando app...</p>
-
 <div class="cards">
-<div class="card">🏆<div id="points" class="value green">0</div></div>
-<div class="card">🚴<div id="activities" class="value">0</div></div>
-<div class="card">📍<div id="km" class="value">0</div></div>
-<div class="card">⛰️<div id="elevation" class="value orange">0</div></div>
+<div class="card">🏆<div id="points" class="value green">0</div><p class="small">puntos</p></div>
+<div class="card">🚴<div id="activities" class="value">0</div><p class="small">salidas</p></div>
+<div class="card">📍<div id="km" class="value">0</div><p class="small">kilómetros</p></div>
+<div class="card">⛰️<div id="elevation" class="value orange">0</div><p class="small">desnivel +</p></div>
 </div>
 
 <div class="grid">
@@ -93,10 +93,10 @@ button{background:#f97316;border:0;padding:14px 18px;border-radius:12px;color:wh
 
 <div>
 <div class="panel">
-<h2>🏆 Podio</h2>
-<p>🥇 Gran Jabalí</p>
-<p>🥈 Colmillo de Plata</p>
-<p>🥉 Pezuña de Hierro</p>
+<h2>🏆 Podio Jabalí</h2>
+<p class="gold">🥇 Gran Jabalí</p>
+<p class="silver">🥈 Colmillo de Plata</p>
+<p class="bronze">🥉 Pezuña de Hierro</p>
 </div>
 </div>
 
@@ -116,18 +116,10 @@ const supabaseClient = window.supabase.createClient(
 );
 
 async function loadDashboard(){
-  const debug = document.getElementById("debug");
-  debug.innerText = "Conectando con Supabase...";
-
   try{
     const profile = await supabaseClient
       .from("profile_dashboard")
       .select("*");
-
-    if(profile.error){
-      debug.innerText = "❌ Error perfil:\n" + JSON.stringify(profile.error);
-      return;
-    }
 
     if(profile.data && profile.data.length > 0){
       const p = profile.data[0];
@@ -156,17 +148,10 @@ async function loadDashboard(){
         "Bienvenido " + name + " · " + badge;
     }
 
-    debug.innerText = "Perfil cargado. Cargando ranking...";
-
     const ranking = await supabaseClient
       .from("weekly_ranking")
       .select("*")
       .limit(1);
-
-    if(ranking.error){
-      debug.innerText = "❌ Error ranking:\n" + JSON.stringify(ranking.error);
-      return;
-    }
 
     if(ranking.data && ranking.data.length > 0){
       const r = ranking.data[0];
@@ -184,16 +169,9 @@ async function loadDashboard(){
         r.total_elevation || 0;
     }
 
-    debug.innerText = "Ranking cargado. Cargando actividades...";
-
     const recent = await supabaseClient
       .from("recent_activities")
       .select("*");
-
-    if(recent.error){
-      debug.innerText = "❌ Error actividades:\n" + JSON.stringify(recent.error);
-      return;
-    }
 
     let html = "";
 
@@ -203,21 +181,20 @@ async function loadDashboard(){
         <div class="activity">
           <div>
             <strong>${a.name || "Actividad"}</strong><br>
-            <span class="small">${a.distance_km || 0} km</span>
+            <span class="small">${a.distance_km || 0} km · ${a.elevation_m || 0} m+</span>
           </div>
-          <div>🏆 ${a.points || 0}</div>
+          <div class="green">🏆 ${a.points || 0}</div>
         </div>
         `;
       });
     }
 
     document.getElementById("recent").innerHTML = html;
-
-    debug.innerText = "🟢 Dashboard cargado correctamente";
   }
 
   catch(e){
-    debug.innerText = "❌ Error JavaScript:\n" + e.message;
+    document.getElementById("welcome").innerText =
+      "Error cargando dashboard";
   }
 }
 
