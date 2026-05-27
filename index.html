@@ -47,22 +47,13 @@ select{background:#111827;border:1px solid #f97316}
 </div>
 
 <div class="layout">
-<div class="card">
 
-<h2>
-
-🔔 Últimos movimientos
-
-</h2>
-
-<div id="notifications">
-
-Cargando movimientos...
-
-</div>
-
-</div>
   <div>
+    <div class="card">
+      <h2>🔔 Últimos movimientos</h2>
+      <div id="notifications">Cargando movimientos...</div>
+    </div>
+
     <div class="card king">
       <h2>👑 Gran Jabalí del año</h2>
       <div id="kingAvatar" class="avatar">J</div>
@@ -365,6 +356,24 @@ async function loadDashboard(){
 
     document.getElementById("recent").innerHTML =
       activities || "Sin actividades";
+
+    status.innerText = "Leyendo movimientos...";
+
+    const notifications = await readPath(
+      "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+    );
+
+    let notificationsHtml = "";
+
+    notifications.forEach((n)=>{
+      notificationsHtml +=
+        "<div class='row'>" +
+        "<div>" + (n.message || "Movimiento detectado") + "</div>" +
+        "</div>";
+    });
+
+    document.getElementById("notifications").innerHTML =
+      notificationsHtml || "Sin movimientos";
 
     status.innerText = "🟢 Dashboard cargado";
   }catch(error){
