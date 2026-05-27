@@ -20,6 +20,7 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
 .gold{color:#facc15}.silver{color:#cbd5e1}.bronze{color:#fb923c}.green{color:#22c55e}
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .strava{background:#fc4c02}
+.admin{background:#16a34a}
 @media(min-width:900px){.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}.grid{grid-template-columns:repeat(4,1fr)}}
 </style>
 </head>
@@ -31,15 +32,17 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
     <h1>🐗 Jabalises Bikers</h1>
     <div id="status" class="status">Preparado</div>
   </div>
+
   <div class="actions">
     <button class="strava" onclick="connectStrava()">🚴 Conectar Strava</button>
     <button onclick="loadDashboard()">🔄 Actualizar</button>
+    <button id="adminSyncBtn" class="admin" onclick="syncStrava()" style="display:none">👑 Actualizar Strava</button>
   </div>
 </div>
 
 <div class="layout">
   <div>
-    <div id="kingCard" class="card king">
+    <div class="card king">
       <h2>👑 Gran Jabalí de la semana</h2>
       <div id="kingAvatar" class="avatar">J</div>
       <h2 id="kingName">Cargando...</h2>
@@ -133,6 +136,53 @@ async function importFromStrava(code){
   return data;
 }
 
+async function checkAdmin(){
+  try{
+    const profiles = await readTable("profile_dashboard");
+
+    if(profiles.length > 0 && profiles[0].role === "admin"){
+      document.getElementById("adminSyncBtn").style.display = "inline-block";
+    }
+  }catch(e){}
+}
+
+async function syncStrava(){
+  const btn = document.getElementById("adminSyncBtn");
+  btn.disabled = true;
+  btn.innerText = "⏳ Sincronizando";
+  document.getElementById("status").innerText = "Sincronizando Strava...";
+
+  try{
+    const response = await fetch(
+      SUPABASE_URL + "/functions/v1/admin-sync-strava",
+      {
+        method:"POST",
+        headers:{
+          "apikey":SUPABASE_KEY,
+          "Authorization":"Bearer " + SUPABASE_KEY
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    if(!data.ok){
+      throw new Error(JSON.stringify(data));
+    }
+
+    document.getElementById("status").innerText =
+      "✅ Strava actualizado · " + data.synced + " participantes";
+
+    await loadDashboard();
+  }catch(error){
+    document.getElementById("status").innerText =
+      "❌ " + error.message;
+  }
+
+  btn.disabled = false;
+  btn.innerText = "👑 Actualizar Strava";
+}
+
 function titulo(pos){
   if(pos === 1) return "🥇 Gran Jabalí";
   if(pos === 2) return "🥈 Colmillo de Plata";
@@ -220,6 +270,8 @@ async function loadDashboard(){
 }
 
 async function start(){
+  await checkAdmin();
+
   const params = new URLSearchParams(window.location.search);
   const code = params.get("code");
 
