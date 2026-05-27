@@ -4,12 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jabalises Bikers</title>
+
 <style>
 *{box-sizing:border-box}
 body{margin:0;background:radial-gradient(circle at top,#17233d,#07111f 60%);color:white;font-family:Arial;padding:22px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}
 h1{margin:0;color:#f97316}
-button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold}
+button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold;cursor:pointer}
 .status,.small{color:#94a3b8}
 .card{background:#111827;border:1px solid #1f2937;border-radius:24px;padding:22px;margin-bottom:16px}
 .king{border:2px solid #facc15;text-align:center}
@@ -43,7 +44,7 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
 <div class="layout">
   <div>
     <div class="card king">
-      <h2>👑 Gran Jabalí de la semana</h2>
+      <h2>👑 Gran Jabalí del año</h2>
       <div id="kingAvatar" class="avatar">J</div>
       <h2 id="kingName">Cargando...</h2>
       <div id="kingPoints" class="value">0</div>
@@ -58,7 +59,7 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
     </div>
 
     <div class="card">
-      <h2>🏆 Clasificación semanal</h2>
+      <h2>🏆 Clasificación anual</h2>
       <div id="rankingList">Cargando ranking...</div>
     </div>
   </div>
@@ -104,6 +105,29 @@ async function readTable(table){
   return JSON.parse(text);
 }
 
+async function checkAdmin(){
+  try{
+    const response = await fetch(
+      SUPABASE_URL + "/rest/v1/profiles?select=role&role=eq.admin&limit=1",
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
+
+    const data = await response.json();
+
+    document.getElementById("adminSyncBtn").style.display =
+      Array.isArray(data) && data.length > 0
+      ? "inline-block"
+      : "none";
+  }catch(e){
+    document.getElementById("adminSyncBtn").style.display = "none";
+  }
+}
+
 function connectStrava(){
   const url =
     "https://www.strava.com/oauth/authorize" +
@@ -121,10 +145,10 @@ async function importFromStrava(code){
     method:"POST",
     headers:{
       "Content-Type":"application/json",
-      "apikey":SUPABASE_KEY,
-      "Authorization":"Bearer " + SUPABASE_KEY
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY
     },
-    body:JSON.stringify({code})
+    body: JSON.stringify({ code })
   });
 
   const data = await response.json();
@@ -134,16 +158,6 @@ async function importFromStrava(code){
   }
 
   return data;
-}
-
-async function checkAdmin(){
-  try{
-    const profiles = await readTable("profile_dashboard");
-
-    if(profiles.length > 0 && profiles[0].role === "admin"){
-      document.getElementById("adminSyncBtn").style.display = "inline-block";
-    }
-  }catch(e){}
 }
 
 async function syncStrava(){
@@ -158,8 +172,8 @@ async function syncStrava(){
       {
         method:"POST",
         headers:{
-          "apikey":SUPABASE_KEY,
-          "Authorization":"Bearer " + SUPABASE_KEY
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
         }
       }
     );
@@ -262,9 +276,7 @@ async function loadDashboard(){
 
     document.getElementById("recent").innerHTML = activities;
     status.innerText = "🟢 Dashboard cargado";
-  }
-
-  catch(error){
+  }catch(error){
     status.innerText = "❌ " + error.message;
   }
 }
@@ -277,8 +289,9 @@ async function start(){
 
   if(code){
     try{
-      document.getElementById("status").innerText = "Importando participante desde Strava...";
+      document.getElementById("status").innerText = "Importando desde Strava...";
       const result = await importFromStrava(code);
+
       document.getElementById("status").innerText =
         "✅ Participante añadido: " + result.athlete + " · " + result.imported + " actividades";
 
