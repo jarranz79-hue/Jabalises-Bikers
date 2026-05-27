@@ -10,7 +10,8 @@
 body{margin:0;background:radial-gradient(circle at top,#17233d,#07111f 60%);color:white;font-family:Arial;padding:22px}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}
 h1{margin:0;color:#f97316}
-button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold;cursor:pointer}
+button,select{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold;cursor:pointer}
+select{background:#111827;border:1px solid #f97316}
 .status,.small{color:#94a3b8}
 .card{background:#111827;border:1px solid #1f2937;border-radius:24px;padding:22px;margin-bottom:16px}
 .king{border:2px solid #facc15;text-align:center}
@@ -22,7 +23,10 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
 .actions{display:flex;gap:10px;flex-wrap:wrap}
 .strava{background:#fc4c02}
 .admin{background:#16a34a}
-@media(min-width:900px){.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}.grid{grid-template-columns:repeat(4,1fr)}}
+@media(min-width:900px){
+.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.grid{grid-template-columns:repeat(4,1fr)}
+}
 </style>
 </head>
 
@@ -35,6 +39,7 @@ button{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 2
   </div>
 
   <div class="actions">
+    <select id="seasonSelect" onchange="changeSeason()"></select>
     <button class="strava" onclick="connectStrava()">🚴 Conectar Strava</button>
     <button onclick="loadDashboard()">🔄 Actualizar</button>
     <button id="adminSyncBtn" class="admin" onclick="syncStrava()" style="display:none">👑 Actualizar Strava</button>
@@ -84,31 +89,61 @@ const FUNCTION_URL = "https://bktwylokqyjuoernembh.supabase.co/functions/v1/stra
 const STRAVA_CLIENT_ID = "250583";
 
 const REDIRECT_URL = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
+let selectedSeason = new Date().getFullYear();
 
-async function readTable(table){
-  const response = await fetch(
-    SUPABASE_URL + "/rest/v1/" + table + "?select=*",
-    {
-      headers:{
-        "apikey": SUPABASE_KEY,
-        "Authorization": "Bearer " + SUPABASE_KEY
-      }
+async function readPath(path){
+  const response = await fetch(SUPABASE_URL + path,{
+    headers:{
+      "apikey": SUPABASE_KEY,
+      "Authorization": "Bearer " + SUPABASE_KEY
     }
-  );
+  });
 
   const text = await response.text();
 
   if(!response.ok){
-    throw new Error(table + " → " + text);
+    throw new Error(path + " → " + text);
   }
 
   return JSON.parse(text);
 }
 
+async function loadSeasons(){
+  const rows = await readPath("/rest/v1/leaderboard_by_season?select=season");
+
+  const seasons = [...new Set(rows.map(r => r.season))]
+    .filter(Boolean)
+    .sort((a,b)=>b-a);
+
+  if(!seasons.includes(selectedSeason) && seasons.length){
+    selectedSeason = seasons[0];
+  }
+
+  const select = document.getElementById("seasonSelect");
+  select.innerHTML = "";
+
+  seasons.forEach((s)=>{
+    const option = document.createElement("option");
+    option.value = s;
+    option.textContent = "Temporada " + s;
+
+    if(Number(s) === Number(selectedSeason)){
+      option.selected = true;
+    }
+
+    select.appendChild(option);
+  });
+}
+
+function changeSeason(){
+  selectedSeason = Number(document.getElementById("seasonSelect").value);
+  loadDashboard();
+}
+
 async function checkAdmin(){
   try{
     const response = await fetch(
-      SUPABASE_URL + "/rest/v1/profiles?select=role&role=eq.admin&limit=1",
+      SUPABASE_URL + "/rest/v1/profile_dashboard?select=role&limit=1",
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -119,10 +154,13 @@ async function checkAdmin(){
 
     const data = await response.json();
 
+    const isAdmin =
+      Array.isArray(data) &&
+      data.length > 0 &&
+      data[0].role === "admin";
+
     document.getElementById("adminSyncBtn").style.display =
-      Array.isArray(data) && data.length > 0
-      ? "inline-block"
-      : "none";
+      isAdmin ? "inline-block" : "none";
   }catch(e){
     document.getElementById("adminSyncBtn").style.display = "none";
   }
@@ -187,6 +225,7 @@ async function syncStrava(){
     document.getElementById("status").innerText =
       "✅ Strava actualizado · " + data.synced + " participantes";
 
+    await loadSeasons();
     await loadDashboard();
   }catch(error){
     document.getElementById("status").innerText =
@@ -216,24 +255,42 @@ async function loadDashboard(){
 
   try{
     status.innerText = "Leyendo ranking...";
-    const ranking = await readTable("leaderboard");
+
+    const ranking = await readPath(
+      "/rest/v1/leaderboard_by_season?season=eq." +
+      selectedSeason +
+      "&select=*"
+    );
 
     if(ranking.length > 0){
       const leader = ranking[0];
       const leaderName = leader.profile_name || "Jabalí";
 
-      document.getElementById("kingAvatar").innerText = leaderName.charAt(0).toUpperCase();
-      document.getElementById("kingName").innerText = leaderName;
-      document.getElementById("kingPoints").innerText = Math.round(leader.total_points || 0) + " pts";
+      document.getElementById("kingAvatar").innerText =
+        leaderName.charAt(0).toUpperCase();
+
+      document.getElementById("kingName").innerText =
+        leaderName;
+
+      document.getElementById("kingPoints").innerText =
+        Math.round(leader.total_points || 0) + " pts";
+
       document.getElementById("kingStats").innerText =
         (leader.activities || 0) + " salidas · " +
         Math.round(leader.total_km || 0) + " km · " +
         Math.round(leader.total_elevation || 0) + " m+";
 
-      document.getElementById("points").innerText = Math.round(leader.total_points || 0);
-      document.getElementById("activities").innerText = leader.activities || 0;
-      document.getElementById("km").innerText = Math.round(leader.total_km || 0);
-      document.getElementById("elevation").innerText = Math.round(leader.total_elevation || 0);
+      document.getElementById("points").innerText =
+        Math.round(leader.total_points || 0);
+
+      document.getElementById("activities").innerText =
+        leader.activities || 0;
+
+      document.getElementById("km").innerText =
+        Math.round(leader.total_km || 0);
+
+      document.getElementById("elevation").innerText =
+        Math.round(leader.total_elevation || 0);
 
       let list = "";
       let podium = "";
@@ -258,10 +315,27 @@ async function loadDashboard(){
 
       document.getElementById("rankingList").innerHTML = list;
       document.getElementById("podium").innerHTML = podium;
+    }else{
+      document.getElementById("kingName").innerText = "Sin datos";
+      document.getElementById("kingPoints").innerText = "0";
+      document.getElementById("kingStats").innerText = "No hay ranking para esta temporada";
+      document.getElementById("points").innerText = "0";
+      document.getElementById("activities").innerText = "0";
+      document.getElementById("km").innerText = "0";
+      document.getElementById("elevation").innerText = "0";
+      document.getElementById("rankingList").innerHTML = "Sin datos";
+      document.getElementById("podium").innerHTML = "Sin datos";
     }
 
     status.innerText = "Leyendo actividades...";
-    const recent = await readTable("recent_activities");
+
+    const recent = await readPath(
+      "/rest/v1/recent_activities?select=*&activity_date=gte." +
+      selectedSeason +
+      "-01-01&activity_date=lt." +
+      (selectedSeason + 1) +
+      "-01-01"
+    );
 
     let activities = "";
 
@@ -274,7 +348,9 @@ async function loadDashboard(){
         "</div>";
     });
 
-    document.getElementById("recent").innerHTML = activities;
+    document.getElementById("recent").innerHTML =
+      activities || "Sin actividades";
+
     status.innerText = "🟢 Dashboard cargado";
   }catch(error){
     status.innerText = "❌ " + error.message;
@@ -290,6 +366,7 @@ async function start(){
   if(code){
     try{
       document.getElementById("status").innerText = "Importando desde Strava...";
+
       const result = await importFromStrava(code);
 
       document.getElementById("status").innerText =
@@ -301,6 +378,7 @@ async function start(){
     }
   }
 
+  await loadSeasons();
   await loadDashboard();
 }
 
