@@ -6,63 +6,179 @@
 <title>Jabalises Bikers</title>
 
 <style>
+
 *{
 box-sizing:border-box
 }
 
 body{
 margin:0;
+padding:22px;
 font-family:Arial;
 background:
 radial-gradient(circle at top,#17233d,#07111f 60%);
 color:white;
-padding:24px;
+}
+
+.header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:14px;
+margin-bottom:18px;
+flex-wrap:wrap;
+}
+
+h1{
+margin:0;
+color:#f97316;
+}
+
+.actions{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+}
+
+button,
+select{
+
+background:#f97316;
+color:white;
+border:0;
+padding:14px 18px;
+border-radius:14px;
+font-weight:bold;
+cursor:pointer;
+
+}
+
+select{
+background:#111827;
+border:1px solid #f97316;
+}
+
+.strava{
+background:#fc4c02;
+}
+
+.status{
+color:#94a3b8;
+margin-top:6px;
 }
 
 .card{
 background:#111827;
 border:1px solid #1f2937;
 border-radius:24px;
-padding:24px;
-max-width:700px;
-margin:auto;
-}
-
-h1{
-margin-top:0;
-color:#f97316;
-}
-
-button{
-background:#fc4c02;
-color:white;
-border:0;
-padding:16px 22px;
-border-radius:14px;
-font-weight:bold;
-cursor:pointer;
-font-size:16px;
-}
-
-#status{
-margin-top:20px;
-color:#94a3b8;
+padding:22px;
+margin-bottom:18px;
 }
 
 .row{
+display:flex;
+justify-content:space-between;
+gap:12px;
 padding:14px 0;
 border-bottom:1px solid #1f2937;
+}
+
+.small{
+color:#94a3b8;
 }
 
 .green{
 color:#22c55e;
 }
+
+.gold{
+color:#facc15;
+}
+
+.silver{
+color:#cbd5e1;
+}
+
+.bronze{
+color:#fb923c;
+}
+
+.podium{
+
+display:grid;
+grid-template-columns:1fr 1.2fr 1fr;
+gap:14px;
+align-items:end;
+
+}
+
+.podium-card{
+
+background:#0b1224;
+border:1px solid #1f2937;
+border-radius:24px;
+padding:20px;
+text-align:center;
+
+}
+
+.first{
+border:2px solid #facc15;
+transform:scale(1.04);
+}
+
+.avatar{
+
+width:72px;
+height:72px;
+border-radius:50%;
+
+margin:auto auto 12px auto;
+
+background:
+linear-gradient(
+135deg,
+#f97316,
+#facc15
+);
+
+display:flex;
+align-items:center;
+justify-content:center;
+
+font-size:32px;
+font-weight:bold;
+color:#111827;
+
+}
+
+.first .avatar{
+width:92px;
+height:92px;
+font-size:42px;
+}
+
+.points{
+font-size:38px;
+font-weight:bold;
+}
+
+@media(max-width:900px){
+
+.podium{
+grid-template-columns:1fr;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="card">
+<div class="header">
+
+<div>
 
 <h1>
 
@@ -70,19 +186,95 @@ color:#22c55e;
 
 </h1>
 
-<button onclick="connectStrava()">
+<div id="status" class="status">
+
+Dashboard cargando...
+
+</div>
+
+</div>
+
+<div class="actions">
+
+<select
+id="seasonSelect"
+onchange="changeSeason()">
+
+</select>
+
+<button
+class="strava"
+onclick="connectStrava()">
 
 🚴 Conectar Strava
 
 </button>
 
-<div id="status">
-
-Esperando conexión...
+</div>
 
 </div>
 
-<div id="result">
+<div class="card">
+
+<h2>
+
+🔔 Últimos movimientos
+
+</h2>
+
+<div id="movements">
+
+Sin movimientos todavía
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+🐗 Podio Jabalí
+
+</h2>
+
+<div
+id="podium"
+class="podium">
+
+Cargando podio...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+🏆 Clasificación anual
+
+</h2>
+
+<div id="ranking">
+
+Cargando ranking...
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>
+
+🚴 Actividades recientes
+
+</h2>
+
+<div id="activities">
+
+Cargando actividades...
 
 </div>
 
@@ -101,7 +293,40 @@ const FUNCTION_URL =
 
 const STRAVA_CLIENT_ID =
 "250583";
-const REDIRECT_URL ="https://jarranz79-hue.github.io/Jabalises-Bikers/";
+const REDIRECT_URL =
+"https://jarranz79-hue.github.io/Jabalises-Bikers/";
+
+let selectedSeason =
+new Date().getFullYear();
+
+async function read(path){
+
+const response =
+await fetch(
+SUPABASE_URL + path,
+{
+headers:{
+apikey:
+SUPABASE_KEY,
+
+Authorization:
+"Bearer " +
+SUPABASE_KEY
+}
+}
+);
+
+if(!response.ok){
+
+throw new Error(
+await response.text()
+);
+
+}
+
+return await response.json();
+
+}
 
 function connectStrava(){
 
@@ -167,6 +392,432 @@ return await response.json();
 
 }
 
+function titleFor(pos){
+
+if(pos===1)
+return "🥇 Gran Jabalí";
+
+if(pos===2)
+return "🥈 Colmillo Plata";
+
+if(pos===3)
+return "🥉 Pezuña Hierro";
+
+return "#" + pos;
+
+}
+
+function colorFor(pos){
+
+if(pos===1)
+return "gold";
+
+if(pos===2)
+return "silver";
+
+if(pos===3)
+return "bronze";
+
+return "";
+
+}
+
+function avatar(name){
+
+return (
+name || "J"
+)
+.charAt(0)
+.toUpperCase();
+
+}
+
+function podiumCard(r){
+
+const first =
+r.position===1
+?
+"first"
+:
+"";
+
+return `
+
+<div class="podium-card ${first}">
+
+<div class="${colorFor(r.position)}">
+
+<strong>
+
+${titleFor(r.position)}
+
+</strong>
+
+</div>
+
+<div class="avatar">
+
+${avatar(r.display_name)}
+
+</div>
+
+<h2>
+
+${r.display_name}
+
+</h2>
+
+<div class="points ${colorFor(r.position)}">
+
+${r.total_points}
+
+</div>
+
+<div class="small">
+
+${r.activities} salidas
+
+</div>
+
+<div class="small">
+
+${r.total_km} km ·
+${r.total_elevation} m+
+
+</div>
+
+</div>
+
+`;
+
+}
+
+async function loadSeasons(){
+
+const rows =
+await read(
+"/rest/v1/yearly_ranking?select=season"
+);
+
+const seasons =
+
+[
+...new Set(
+rows.map(r=>r.season)
+)
+]
+
+.filter(Boolean)
+
+.sort((a,b)=>b-a);
+
+const select =
+document.getElementById(
+"seasonSelect"
+);
+
+select.innerHTML="";
+
+seasons.forEach((s)=>{
+
+const option =
+document.createElement(
+"option"
+);
+
+option.value=s;
+
+option.textContent=
+"Temporada " + s;
+
+if(
+Number(s)
+===
+Number(selectedSeason)
+){
+option.selected=true;
+}
+
+select.appendChild(option);
+
+});
+
+}
+
+function changeSeason(){
+
+selectedSeason =
+Number(
+document.getElementById(
+"seasonSelect"
+).value
+);
+
+loadDashboard();
+
+}
+
+async function loadDashboard(){
+
+try{
+
+document
+.getElementById(
+"status"
+)
+.innerText =
+"Leyendo ranking...";
+
+const ranking =
+await read(
+
+"/rest/v1/yearly_ranking?season=eq."
++
+selectedSeason
++
+"&order=position.asc"
+
+);
+
+const top3 =
+ranking.filter(
+r=>r.position<=3
+);
+
+const rest =
+ranking.filter(
+r=>r.position>=4
+);
+
+let podiumHtml="";
+
+const second =
+top3.find(r=>r.position===2);
+
+const first =
+top3.find(r=>r.position===1);
+
+const third =
+top3.find(r=>r.position===3);
+
+if(second)
+podiumHtml +=
+podiumCard(second);
+
+if(first)
+podiumHtml +=
+podiumCard(first);
+
+if(third)
+podiumHtml +=
+podiumCard(third);
+
+document
+.getElementById(
+"podium"
+)
+.innerHTML =
+
+podiumHtml
+||
+"Sin podio";
+
+let rankingHtml="";
+
+rest.forEach((r)=>{
+
+rankingHtml +=
+
+"<div class='row'>"
+
++
+
+"<div>"
+
++
+
+"<strong>#"
+
++
+
+r.position
+
++
+
+"</strong><br>"
+
++
+
+"<span class='small'>"
+
++
+
+r.display_name
+
++
+
+"</span>"
+
++
+
+"</div>"
+
++
+
+"<div class='green'>"
+
++
+
+r.total_points
+
++
+
+" pts"
+
++
+
+"</div>"
+
++
+
+"</div>";
+
+});
+
+document
+.getElementById(
+"ranking"
+)
+.innerHTML =
+
+rankingHtml
+||
+"No hay más participantes";
+
+document
+.getElementById(
+"status"
+)
+.innerText =
+"Leyendo actividades...";
+
+const activities =
+await read(
+
+"/rest/v1/activities?select=*"
+
++
+
+"&order=activity_date.desc"
+
++
+
+"&limit=12"
+
+);
+
+let activitiesHtml="";
+
+activities.forEach((a)=>{
+
+activitiesHtml +=
+
+"<div class='row'>"
+
++
+
+"<div>"
+
++
+
+"<strong>"
+
++
+
+(a.name || "Actividad")
+
++
+
+"</strong><br>"
+
++
+
+"<span class='small'>"
+
++
+
+(a.distance_km || 0)
+
++
+
+" km · "
+
++
+
+(a.elevation_m || 0)
+
++
+
+" m+"
+
++
+
+"</span>"
+
++
+
+"</div>"
+
++
+
+"<div class='green'>🏆 "
+
++
+
+(a.points || 0)
+
++
+
+"</div>"
+
++
+
+"</div>";
+
+});
+
+document
+.getElementById(
+"activities"
+)
+.innerHTML =
+
+activitiesHtml
+||
+"Sin actividades";
+
+document
+.getElementById(
+"status"
+)
+.innerText =
+"🟢 Dashboard cargado";
+
+}
+catch(error){
+
+document
+.getElementById(
+"status"
+)
+.innerText =
+"❌ " +
+error.message;
+
+}
+
+}
+
 async function start(){
 
 const params =
@@ -177,16 +828,14 @@ window.location.search
 const code =
 params.get("code");
 
-if(!code){
-return;
-}
+if(code){
 
 document
 .getElementById(
 "status"
 )
 .innerText =
-"Importando actividades desde Strava...";
+"Importando Strava...";
 
 try{
 
@@ -203,70 +852,6 @@ JSON.stringify(result)
 
 }
 
-document
-.getElementById(
-"status"
-)
-.innerHTML =
-
-"<span class='green'>"
-
-+
-
-"✅ Conectado correctamente"
-
-+
-
-"</span>";
-
-document
-.getElementById(
-"result"
-)
-.innerHTML =
-
-"<div class='row'>👤 "
-
-+
-
-result.athlete
-
-+
-
-"</div>"
-
-+
-
-"<div class='row'>🚴 Actividades importadas: "
-
-+
-
-result.imported
-
-+
-
-"</div>"
-
-+
-
-"<div class='row'>🏆 Puntos "
-
-+
-
-result.current_year
-
-+
-
-": "
-
-+
-
-result.current_year_points
-
-+
-
-"</div>";
-
 window.history.replaceState(
 {},
 document.title,
@@ -280,12 +865,19 @@ document
 .getElementById(
 "status"
 )
-.innerHTML =
-
+.innerText =
 "❌ " +
 error.message;
 
+return;
+
 }
+
+}
+
+await loadSeasons();
+
+await loadDashboard();
 
 }
 
