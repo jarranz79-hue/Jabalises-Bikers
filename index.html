@@ -7,308 +7,88 @@
 
 <style>
 *{box-sizing:border-box}
-
-body{
-margin:0;
-background:
-radial-gradient(circle at top,#17233d,#07111f 60%);
-color:white;
-font-family:Arial;
-padding:22px;
+body{margin:0;background:radial-gradient(circle at top,#17233d,#07111f 60%);color:white;font-family:Arial;padding:22px}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:22px;gap:12px}
+h1{margin:0;color:#f97316}
+button,select{background:#f97316;color:white;border:0;border-radius:14px;padding:14px 20px;font-weight:bold;cursor:pointer}
+select{background:#111827;border:1px solid #f97316}
+.status,.small{color:#94a3b8}
+.card{background:#111827;border:1px solid #1f2937;border-radius:24px;padding:22px;margin-bottom:16px}
+.king{border:2px solid #facc15;text-align:center}
+.avatar{width:90px;height:90px;border-radius:50%;margin:auto;background:linear-gradient(135deg,#f97316,#facc15);color:#111827;display:flex;align-items:center;justify-content:center;font-size:40px;font-weight:bold}
+.value{font-size:44px;font-weight:bold;color:#22c55e}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:14px 0;border-bottom:1px solid #1f2937}
+.gold{color:#facc15}.silver{color:#cbd5e1}.bronze{color:#fb923c}.green{color:#22c55e}
+.actions{display:flex;gap:10px;flex-wrap:wrap}
+.strava{background:#fc4c02}
+.admin{background:#16a34a}
+@media(min-width:900px){
+.layout{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+.grid{grid-template-columns:repeat(4,1fr)}
 }
-
-.header{
-display:flex;
-justify-content:space-between;
-align-items:center;
-margin-bottom:22px;
-gap:12px;
-flex-wrap:wrap;
-}
-
-h1{
-margin:0;
-color:#f97316;
-}
-
-button,
-select{
-
-background:#f97316;
-color:white;
-border:0;
-border-radius:14px;
-padding:14px 20px;
-font-weight:bold;
-cursor:pointer;
-
-}
-
-select{
-background:#111827;
-border:1px solid #f97316;
-}
-
-.status,
-.small{
-color:#94a3b8;
-}
-
-.card{
-background:#111827;
-border:1px solid #1f2937;
-border-radius:24px;
-padding:22px;
-margin-bottom:16px;
-}
-
-.actions{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-.strava{
-background:#fc4c02;
-}
-
-.admin{
-background:#16a34a;
-}
-
-.row{
-display:flex;
-justify-content:space-between;
-gap:12px;
-padding:14px 0;
-border-bottom:1px solid #1f2937;
-}
-
-.green{
-color:#22c55e;
-}
-
-.gold{
-color:#facc15;
-}
-
-.silver{
-color:#cbd5e1;
-}
-
-.bronze{
-color:#fb923c;
-}
-
-.podium{
-display:grid;
-grid-template-columns:1fr 1.25fr 1fr;
-gap:14px;
-align-items:end;
-}
-
-.podium-card{
-
-background:#0b1224;
-border:1px solid #1f2937;
-border-radius:24px;
-padding:20px;
-text-align:center;
-min-height:210px;
-
-}
-
-.podium-card.first{
-
-min-height:260px;
-
-border:2px solid #facc15;
-
-box-shadow:
-0 0 28px
-rgba(250,204,21,.25);
-
-}
-
-.avatar{
-
-width:78px;
-height:78px;
-border-radius:50%;
-margin:12px auto;
-
-background:
-linear-gradient(
-135deg,
-#f97316,
-#facc15
-);
-
-color:#111827;
-
-display:flex;
-align-items:center;
-justify-content:center;
-
-font-size:34px;
-font-weight:bold;
-
-}
-
-.podium-card.first .avatar{
-
-width:100px;
-height:100px;
-font-size:44px;
-
-}
-
-.value{
-
-font-size:44px;
-font-weight:bold;
-
-}
-
-@media(max-width:900px){
-
-.header{
-align-items:flex-start;
-flex-direction:column;
-}
-
-.podium{
-grid-template-columns:1fr;
-}
-
-}
-
 </style>
 </head>
 
 <body>
 
 <div class="header">
+  <div>
+    <h1>🐗 Jabalises Bikers</h1>
+    <div id="status" class="status">Preparado</div>
+  </div>
 
-<div>
-
-<h1>
-
-🐗 Jabalises Bikers
-
-</h1>
-
-<div
-id="status"
-class="status">
-
-Preparado
-
-</div>
-
-</div>
-
-<div class="actions">
-
-<select
-id="seasonSelect"
-onchange="changeSeason()">
-
-</select>
-
-<button
-class="strava"
-onclick="connectStrava()">
-
-🚴 Conectar Strava
-
-</button>
-
-<button
-onclick="loadDashboard()">
-
-🔄 Actualizar
-
-</button>
-
-<button
-id="adminSyncBtn"
-class="admin"
-onclick="syncStrava()"
-style="display:none">
-
-👑 Actualizar Strava
-
-</button>
-
-</div>
-
+  <div class="actions">
+    <select id="seasonSelect" onchange="changeSeason()"></select>
+    <button class="strava" onclick="connectStrava()">🚴 Conectar Strava</button>
+    <button onclick="loadDashboard()">🔄 Actualizar</button>
+    <button id="adminSyncBtn" class="admin" onclick="syncStrava()" style="display:none">👑 Actualizar Strava</button>
+  </div>
 </div>
 
 <div class="card">
-
-<h2>
-
-🔔 Últimos movimientos
-
-</h2>
-
-<div id="notifications">
-
-Cargando movimientos...
-
+  <h2>🔔 Últimos movimientos</h2>
+  <div id="notifications">Cargando movimientos...</div>
 </div>
 
-</div>
+<div class="layout">
+  <div>
 
-<div class="card">
+    <div class="card king">
+      <h2>👑 Gran Jabalí del año</h2>
+      <div id="kingAvatar" class="avatar">J</div>
+      <h2 id="kingName">Cargando...</h2>
+      <div id="kingPoints" class="value">0</div>
+      <p id="kingStats" class="small">Esperando datos</p>
+    </div>
 
-<h2>
+    <div class="grid">
+      <div class="card">🏆<div id="points" class="value">0</div><p class="small">Puntos</p></div>
+      <div class="card">🚴<div id="activities" class="value">0</div><p class="small">Salidas</p></div>
+      <div class="card">📍<div id="km" class="value">0</div><p class="small">Km</p></div>
+      <div class="card">⛰️<div id="elevation" class="value">0</div><p class="small">Desnivel</p></div>
+    </div>
 
-🐗 Podio Jabalí
+    <div class="card">
+      <h2>🏆 Clasificación anual</h2>
+      <div id="rankingList">Cargando ranking...</div>
+    </div>
 
-</h2>
+  </div>
 
-<div
-id="podium"
-class="podium">
+  <div>
 
-Cargando podio...
+    <div class="card">
+      <h2>🐗 Podio Jabalí</h2>
+      <div id="podium">Cargando podio...</div>
+    </div>
 
-</div>
+    <div class="card">
+      <h2>🚴 Actividades recientes</h2>
+      <div id="recent">Cargando actividades...</div>
+    </div>
 
-</div>
-
-<div class="card">
-
-<h2>
-
-🏆 Clasificación anual
-
-</h2>
-
-<div id="rankingList">
-
-Cargando ranking...
-
-</div>
-
-</div>
-
-<div class="card">
-
-<h2>
-
-🚴 Actividades recientes
-
-</h2>
-
-<div id="recent">
-
-Cargando actividades...
-
-</div>
-
+  </div>
 </div>
 
 <script>
@@ -327,816 +107,438 @@ const STRAVA_CLIENT_ID =
 "250583";
 
 
+const REDIRECT_URL =
+"https://jarranz79-hue.github.io/Jabalises-Bikers/";
+
 let selectedSeason =
-new Date()
-.getFullYear();
+new Date().getFullYear();
 
 async function readPath(path){
 
-const response =
-await fetch(
-SUPABASE_URL + path,
-{
-headers:{
-apikey:
-SUPABASE_KEY,
+  const response =
+  await fetch(
+    SUPABASE_URL + path,
+    {
+      headers:{
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+      }
+    }
+  );
 
-Authorization:
-"Bearer " +
-SUPABASE_KEY
-}
-}
-);
+  const text =
+  await response.text();
 
-const text =
-await response.text();
+  if(!response.ok){
+    throw new Error(path + " → " + text);
+  }
 
-if(!response.ok){
-
-throw new Error(
-path + " → " + text
-);
-
-}
-
-return JSON.parse(text);
+  return JSON.parse(text);
 
 }
 
 async function loadSeasons(){
 
-const rows =
-await readPath(
-"/rest/v1/leaderboard_by_season?select=season"
-);
+  const rows =
+  await readPath(
+    "/rest/v1/leaderboard_by_season?select=season"
+  );
 
-const seasons =
+  const seasons =
+  [...new Set(rows.map(r => r.season))]
+  .filter(Boolean)
+  .sort((a,b)=>b-a);
 
-[
-...new Set(
-rows.map(
-r=>r.season
-)
-)
-]
+  if(!seasons.includes(selectedSeason) && seasons.length){
+    selectedSeason = seasons[0];
+  }
 
-.filter(Boolean)
+  const select =
+  document.getElementById("seasonSelect");
 
-.sort(
-(a,b)=>b-a
-);
+  select.innerHTML = "";
 
-if(
-!seasons.includes(selectedSeason)
-&&
-seasons.length
-){
+  seasons.forEach((s)=>{
 
-selectedSeason =
-seasons[0];
+    const option =
+    document.createElement("option");
 
-}
+    option.value = s;
+    option.textContent = "Temporada " + s;
 
-const select =
-document.getElementById(
-"seasonSelect"
-);
+    if(Number(s) === Number(selectedSeason)){
+      option.selected = true;
+    }
 
-select.innerHTML = "";
+    select.appendChild(option);
 
-seasons.forEach((s)=>{
-
-const option =
-document.createElement(
-"option"
-);
-
-option.value = s;
-
-option.textContent =
-"Temporada " + s;
-
-if(
-Number(s)
-===
-Number(selectedSeason)
-){
-
-option.selected=true;
-
-}
-
-select.appendChild(option);
-
-});
+  });
 
 }
 
 function changeSeason(){
 
-selectedSeason =
-Number(
-document.getElementById(
-"seasonSelect"
-).value
-);
+  selectedSeason =
+  Number(
+    document.getElementById("seasonSelect").value
+  );
 
-loadDashboard();
+  loadDashboard();
 
 }
 
 async function checkAdmin(){
 
-try{
+  try{
 
-const response =
-await fetch(
+    const response =
+    await fetch(
+      SUPABASE_URL +
+      "/rest/v1/profiles?select=role&role=eq.admin",
+      {
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
 
-SUPABASE_URL +
-"/rest/v1/profiles?select=role&role=eq.admin",
+    const data =
+    await response.json();
 
-{
-headers:{
-apikey:
-SUPABASE_KEY,
+    document.getElementById("adminSyncBtn").style.display =
+      Array.isArray(data) && data.length > 0
+      ? "inline-block"
+      : "none";
 
-Authorization:
-"Bearer " +
-SUPABASE_KEY
-}
-}
+  }catch(e){
 
-);
+    document.getElementById("adminSyncBtn").style.display =
+    "none";
 
-const data =
-await response.json();
-
-document
-.getElementById(
-"adminSyncBtn"
-)
-.style.display =
-
-Array.isArray(data)
-&&
-data.length > 0
-
-? "inline-block"
-: "none";
-
-}
-catch(e){
-
-document
-.getElementById(
-"adminSyncBtn"
-)
-.style.display =
-"none";
-
-}
+  }
 
 }
 
 function connectStrava(){
 
-const url =
+  const url =
+    "https://www.strava.com/oauth/authorize" +
+    "?client_id=" + STRAVA_CLIENT_ID +
+    "&response_type=code" +
+    "&redirect_uri=" + encodeURIComponent(REDIRECT_URL) +
+    "&approval_prompt=force" +
+    "&scope=read,activity:read_all";
 
-"https://www.strava.com/oauth/authorize"
-
-+
-
-"?client_id=" +
-STRAVA_CLIENT_ID
-
-+
-
-"&response_type=code"
-
-+
-
-"&redirect_uri=" +
-encodeURIComponent(
-REDIRECT_URL
-)
-
-+
-
-"&approval_prompt=force"
-
-+
-
-"&scope=read,activity:read_all";
-
-window.location.href =
-url;
+  window.location.href = url;
 
 }
 
 async function importFromStrava(code){
 
-const response =
-await fetch(
-FUNCTION_URL,
-{
-method:"POST",
+  const response =
+  await fetch(
+    FUNCTION_URL,
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "apikey": SUPABASE_KEY,
+        "Authorization": "Bearer " + SUPABASE_KEY
+      },
+      body: JSON.stringify({ code })
+    }
+  );
 
-headers:{
-"Content-Type":
-"application/json",
+  const data =
+  await response.json();
 
-apikey:
-SUPABASE_KEY,
+  if(!data.ok){
+    throw new Error(JSON.stringify(data));
+  }
 
-Authorization:
-"Bearer " +
-SUPABASE_KEY
-},
-
-body:
-JSON.stringify({code})
-}
-);
-
-const data =
-await response.json();
-
-if(!data.ok){
-
-throw new Error(
-JSON.stringify(data)
-);
-
-}
-
-return data;
+  return data;
 
 }
 
 async function syncStrava(){
 
-const btn =
-document.getElementById(
-"adminSyncBtn"
-);
+  const btn =
+  document.getElementById("adminSyncBtn");
 
-btn.disabled=true;
+  btn.disabled = true;
+  btn.innerText = "⏳ Sincronizando";
 
-btn.innerText=
-"⏳ Sincronizando";
+  document.getElementById("status").innerText =
+  "Sincronizando Strava...";
 
-document
-.getElementById(
-"status"
-)
-.innerText=
-"Sincronizando Strava...";
+  try{
 
-try{
+    const response =
+    await fetch(
+      SUPABASE_URL + "/functions/v1/admin-sync-strava",
+      {
+        method:"POST",
+        headers:{
+          "apikey": SUPABASE_KEY,
+          "Authorization": "Bearer " + SUPABASE_KEY
+        }
+      }
+    );
 
-const response =
-await fetch(
+    const data =
+    await response.json();
 
-SUPABASE_URL +
-"/functions/v1/admin-sync-strava",
+    if(!data.ok){
+      throw new Error(JSON.stringify(data));
+    }
 
-{
-method:"POST",
+    document.getElementById("status").innerText =
+      "✅ Strava actualizado · " +
+      data.synced +
+      " participantes";
 
-headers:{
-apikey:
-SUPABASE_KEY,
+    await loadSeasons();
+    await loadDashboard();
 
-Authorization:
-"Bearer " +
-SUPABASE_KEY
-}
-}
+  }catch(error){
 
-);
+    document.getElementById("status").innerText =
+    "❌ " + error.message;
 
-const data =
-await response.json();
+  }
 
-if(!data.ok){
-
-throw new Error(
-JSON.stringify(data)
-);
-
-}
-
-document
-.getElementById(
-"status"
-)
-.innerText =
-
-"✅ Strava actualizado · "
-+
-data.synced
-+
-" participantes";
-
-await loadSeasons();
-
-await loadDashboard();
-
-}
-catch(error){
-
-document
-.getElementById(
-"status"
-)
-.innerText =
-"❌ " +
-error.message;
-
-}
-
-btn.disabled=false;
-
-btn.innerText=
-"👑 Actualizar Strava";
+  btn.disabled = false;
+  btn.innerText = "👑 Actualizar Strava";
 
 }
 
 function titulo(pos){
 
-if(pos===1)
-return "🥇 Gran Jabalí";
+  if(pos === 1) return "🥇 Gran Jabalí";
+  if(pos === 2) return "🥈 Colmillo de Plata";
+  if(pos === 3) return "🥉 Pezuña de Hierro";
 
-if(pos===2)
-return "🥈 Colmillo de Plata";
-
-if(pos===3)
-return "🥉 Pezuña de Hierro";
-
-return "#" + pos;
+  return "#" + pos;
 
 }
 
 function color(pos){
 
-if(pos===1)
-return "gold";
+  if(pos === 1) return "gold";
+  if(pos === 2) return "silver";
+  if(pos === 3) return "bronze";
 
-if(pos===2)
-return "silver";
-
-if(pos===3)
-return "bronze";
-
-return "";
-
-}
-
-function avatar(name){
-
-return (
-name || "J"
-)
-.charAt(0)
-.toUpperCase();
-
-}
-
-function podiumCard(r){
-
-const name =
-r.profile_name
-||
-"Jabalí";
-
-const first =
-r.position===1
-?
-" first"
-:
-"";
-
-return `
-
-<div class="podium-card${first}">
-
-<div class="${color(r.position)}">
-
-<strong>
-
-${titulo(r.position)}
-
-</strong>
-
-</div>
-
-<div class="avatar">
-
-${avatar(name)}
-
-</div>
-
-<h2>
-
-${name}
-
-</h2>
-
-<div class="value ${color(r.position)}">
-
-${Math.round(
-r.total_points || 0
-)}
-
-</div>
-
-<p class="small">
-
-${r.activities || 0}
-salidas ·
-
-${Math.round(
-r.total_km || 0
-)}
-km ·
-
-${Math.round(
-r.total_elevation || 0
-)}
-m+
-
-</p>
-
-</div>
-
-`;
+  return "";
 
 }
 
 async function loadDashboard(){
 
-const status =
-document.getElementById(
-"status"
-);
+  const status =
+  document.getElementById("status");
+
+  try{
 
-try{
+    status.innerText = "Leyendo ranking...";
 
-status.innerText =
-"Leyendo ranking...";
+    const ranking =
+    await readPath(
+      "/rest/v1/leaderboard_by_season?season=eq." +
+      selectedSeason +
+      "&select=*"
+    );
+
+    if(ranking.length > 0){
+
+      const leader = ranking[0];
+      const leaderName =
+      leader.profile_name || "Jabalí";
+
+      document.getElementById("kingAvatar").innerText =
+      leaderName.charAt(0).toUpperCase();
+
+      document.getElementById("kingName").innerText =
+      leaderName;
+
+      document.getElementById("kingPoints").innerText =
+      Math.round(leader.total_points || 0) + " pts";
+
+      document.getElementById("kingStats").innerText =
+        (leader.activities || 0) + " salidas · " +
+        Math.round(leader.total_km || 0) + " km · " +
+        Math.round(leader.total_elevation || 0) + " m+";
+
+      document.getElementById("points").innerText =
+      Math.round(leader.total_points || 0);
 
-const ranking =
-await readPath(
+      document.getElementById("activities").innerText =
+      leader.activities || 0;
+
+      document.getElementById("km").innerText =
+      Math.round(leader.total_km || 0);
+
+      document.getElementById("elevation").innerText =
+      Math.round(leader.total_elevation || 0);
+
+      let list = "";
+      let podium = "";
 
-"/rest/v1/leaderboard_by_season?season=eq."
-+
-selectedSeason
-+
-"&select=*"
+      ranking.forEach((r)=>{
+
+        list +=
+          "<div class='row'>" +
+          "<div><strong class='" + color(r.position) + "'>" +
+          titulo(r.position) +
+          "</strong><br>" +
+          "<span class='small'>" +
+          (r.profile_name || "Jabalí") +
+          "</span></div>" +
+          "<div class='green'><strong>" +
+          Math.round(r.total_points || 0) +
+          " pts</strong></div>" +
+          "</div>";
 
-);
+        if(r.position <= 3){
 
-if(ranking.length > 0){
+          podium +=
+            "<div class='row'>" +
+            "<div><strong class='" + color(r.position) + "'>" +
+            titulo(r.position) +
+            "</strong><br>" +
+            "<span class='small'>" +
+            (r.profile_name || "Jabalí") +
+            "</span></div>" +
+            "<div>" +
+            Math.round(r.total_points || 0) +
+            " pts</div>" +
+            "</div>";
 
-const second =
-ranking.find(
-r=>r.position===2
-);
+        }
 
-const first =
-ranking.find(
-r=>r.position===1
-);
+      });
 
-const third =
-ranking.find(
-r=>r.position===3
-);
+      document.getElementById("rankingList").innerHTML =
+      list;
 
-let podium = "";
+      document.getElementById("podium").innerHTML =
+      podium;
 
-if(second)
-podium +=
-podiumCard(second);
+    }
 
-if(first)
-podium +=
-podiumCard(first);
+    status.innerText =
+    "Leyendo actividades...";
 
-if(third)
-podium +=
-podiumCard(third);
+    const recent =
+    await readPath(
+      "/rest/v1/recent_activities?select=*&activity_date=gte." +
+      selectedSeason +
+      "-01-01&activity_date=lt." +
+      (selectedSeason + 1) +
+      "-01-01"
+    );
 
-document
-.getElementById(
-"podium"
-)
-.innerHTML =
+    let activities = "";
 
-podium
-||
-"Sin podio";
+    recent.forEach((a)=>{
 
-let list="";
+      activities +=
+        "<div class='row'>" +
+        "<div><strong>" +
+        (a.name || "Actividad") +
+        "</strong><br>" +
+        "<span class='small'>" +
+        (a.distance_km || 0) +
+        " km · " +
+        (a.elevation_m || 0) +
+        " m+</span></div>" +
+        "<div class='green'>🏆 " +
+        (a.points || 0) +
+        "</div>" +
+        "</div>";
 
-ranking
+    });
 
-.filter(
-r=>r.position>=4
-)
+    document.getElementById("recent").innerHTML =
+    activities || "Sin actividades";
 
-.forEach((r)=>{
+    const notifications =
+    await readPath(
+      "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+    );
 
-list +=
+    let notificationsHtml = "";
 
-"<div class='row'>"
+    notifications.forEach((n)=>{
 
-+
+      notificationsHtml +=
+        "<div class='row'>" +
+        "<div>" +
+        (n.message || "") +
+        "</div>" +
+        "</div>";
 
-"<div><strong>"
+    });
 
-+
+    document.getElementById("notifications").innerHTML =
+      notificationsHtml || "Sin movimientos";
 
-titulo(r.position)
+    status.innerText =
+    "🟢 Dashboard cargado";
 
-+
+  }catch(error){
 
-"</strong><br>"
+    status.innerText =
+    "❌ " + error.message;
 
-+
-
-"<span class='small'>"
-
-+
-
-(r.profile_name || "Jabalí")
-
-+
-
-"</span></div>"
-
-+
-
-"<div class='green'><strong>"
-
-+
-
-Math.round(
-r.total_points || 0
-)
-
-+
-
-" pts</strong></div>"
-
-+
-
-"</div>";
-
-});
-
-document
-.getElementById(
-"rankingList"
-)
-.innerHTML =
-
-list
-||
-"No hay más participantes todavía";
-
-}
-
-status.innerText =
-"Leyendo actividades...";
-
-const recent =
-await readPath(
-
-"/rest/v1/recent_activities?select=*&activity_date=gte."
-
-+
-
-selectedSeason
-
-+
-
-"-01-01&activity_date=lt."
-
-+
-
-(selectedSeason+1)
-
-+
-
-"-01-01"
-
-);
-
-let activities="";
-
-recent.forEach((a)=>{
-
-activities +=
-
-"<div class='row'>"
-
-+
-
-"<div><strong>"
-
-+
-
-(a.name || "Actividad")
-
-+
-
-"</strong><br>"
-
-+
-
-"<span class='small'>"
-
-+
-
-(a.distance_km || 0)
-
-+
-
-" km · "
-
-+
-
-(a.elevation_m || 0)
-
-+
-
-" m+</span></div>"
-
-+
-
-"<div class='green'>🏆 "
-
-+
-
-(a.points || 0)
-
-+
-
-"</div>"
-
-+
-
-"</div>";
-
-});
-
-document
-.getElementById(
-"recent"
-)
-.innerHTML =
-
-activities
-||
-"Sin actividades";
-
-status.innerText =
-"Leyendo movimientos...";
-
-const notifications =
-await readPath(
-
-"/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
-
-);
-
-let notificationsHtml="";
-
-notifications.forEach((n)=>{
-
-notificationsHtml +=
-
-"<div class='row'>"
-
-+
-
-"<div>"
-
-+
-
-(n.message || "Movimiento detectado")
-
-+
-
-"</div>"
-
-+
-
-"</div>";
-
-});
-
-document
-.getElementById(
-"notifications"
-)
-.innerHTML =
-
-notificationsHtml
-||
-"Sin movimientos";
-
-status.innerText =
-"🟢 Dashboard cargado";
-
-}
-catch(error){
-
-status.innerText =
-"❌ " +
-error.message;
-
-}
+  }
 
 }
 
 async function start(){
 
-await checkAdmin();
+  await checkAdmin();
 
-const params =
-new URLSearchParams(
-window.location.search
-);
+  const params =
+  new URLSearchParams(window.location.search);
 
-const code =
-params.get("code");
+  const code =
+  params.get("code");
 
-if(code){
+  if(code){
 
-try{
+    try{
 
-document
-.getElementById(
-"status"
-)
-.innerText =
-"Importando desde Strava...";
+      document.getElementById("status").innerText =
+      "Importando desde Strava...";
 
-const result =
-await importFromStrava(
-code
-);
+      const result =
+      await importFromStrava(code);
 
-document
-.getElementById(
-"status"
-)
-.innerText =
+      document.getElementById("status").innerText =
+        "✅ Participante añadido: " +
+        result.athlete +
+        " · " +
+        result.imported +
+        " actividades";
 
-"✅ Participante añadido: "
+      window.history.replaceState(
+        {},
+        document.title,
+        REDIRECT_URL
+      );
 
-+
+    }catch(error){
 
-result.athlete
+      document.getElementById("status").innerText =
+      "❌ " + error.message;
 
-+
+    }
 
-" · "
+  }
 
-+
-
-result.imported
-
-+
-
-" actividades";
-
-window.history.replaceState(
-{},
-document.title,
-REDIRECT_URL
-);
-
-}
-catch(error){
-
-document
-.getElementById(
-"status"
-)
-.innerText =
-"❌ " +
-error.message;
-
-}
-
-}
-
-await loadSeasons();
-
-await loadDashboard();
+  await loadSeasons();
+  await loadDashboard();
 
 }
 
