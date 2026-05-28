@@ -53,7 +53,6 @@ select{background:#111827;border:1px solid #f97316}
 
 <div class="layout">
   <div>
-
     <div class="card king">
       <h2>👑 Gran Jabalí del año</h2>
       <div id="kingAvatar" class="avatar">J</div>
@@ -73,11 +72,9 @@ select{background:#111827;border:1px solid #f97316}
       <h2>🏆 Clasificación anual</h2>
       <div id="rankingList">Cargando ranking...</div>
     </div>
-
   </div>
 
   <div>
-
     <div class="card">
       <h2>🐗 Podio Jabalí</h2>
       <div id="podium">Cargando podio...</div>
@@ -87,12 +84,10 @@ select{background:#111827;border:1px solid #f97316}
       <h2>🚴 Actividades recientes</h2>
       <div id="recent">Cargando actividades...</div>
     </div>
-
   </div>
 </div>
 
 <script>
-
 const SUPABASE_URL =
 "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJrdHd5bG9rcXlqdW9lcm5lbWJoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk2NjAyMTAsImV4cCI6MjA5NTIzNjIxMH0.1AEpUCfoGn7-KYIU8tcQhmfLvd5Go6KyIBXTdp-9_vM
 ";
@@ -107,16 +102,11 @@ const STRAVA_CLIENT_ID =
 "250583";
 
 
-const REDIRECT_URL =
-"https://jarranz79-hue.github.io/Jabalises-Bikers/";
-
-let selectedSeason =
-new Date().getFullYear();
+const REDIRECT_URL = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
+let selectedSeason = new Date().getFullYear();
 
 async function readPath(path){
-
-  const response =
-  await fetch(
+  const response = await fetch(
     SUPABASE_URL + path,
     {
       headers:{
@@ -126,43 +116,31 @@ async function readPath(path){
     }
   );
 
-  const text =
-  await response.text();
+  const text = await response.text();
 
   if(!response.ok){
     throw new Error(path + " → " + text);
   }
 
   return JSON.parse(text);
-
 }
 
 async function loadSeasons(){
+  const rows = await readPath("/rest/v1/leaderboard_by_season?select=season");
 
-  const rows =
-  await readPath(
-    "/rest/v1/leaderboard_by_season?select=season"
-  );
-
-  const seasons =
-  [...new Set(rows.map(r => r.season))]
-  .filter(Boolean)
-  .sort((a,b)=>b-a);
+  const seasons = [...new Set(rows.map(r => r.season))]
+    .filter(Boolean)
+    .sort((a,b)=>b-a);
 
   if(!seasons.includes(selectedSeason) && seasons.length){
     selectedSeason = seasons[0];
   }
 
-  const select =
-  document.getElementById("seasonSelect");
-
+  const select = document.getElementById("seasonSelect");
   select.innerHTML = "";
 
   seasons.forEach((s)=>{
-
-    const option =
-    document.createElement("option");
-
+    const option = document.createElement("option");
     option.value = s;
     option.textContent = "Temporada " + s;
 
@@ -171,30 +149,18 @@ async function loadSeasons(){
     }
 
     select.appendChild(option);
-
   });
-
 }
 
 function changeSeason(){
-
-  selectedSeason =
-  Number(
-    document.getElementById("seasonSelect").value
-  );
-
+  selectedSeason = Number(document.getElementById("seasonSelect").value);
   loadDashboard();
-
 }
 
 async function checkAdmin(){
-
   try{
-
-    const response =
-    await fetch(
-      SUPABASE_URL +
-      "/rest/v1/profiles?select=role&role=eq.admin",
+    const response = await fetch(
+      SUPABASE_URL + "/rest/v1/profiles?select=role&role=eq.admin",
       {
         headers:{
           "apikey": SUPABASE_KEY,
@@ -203,8 +169,7 @@ async function checkAdmin(){
       }
     );
 
-    const data =
-    await response.json();
+    const data = await response.json();
 
     document.getElementById("adminSyncBtn").style.display =
       Array.isArray(data) && data.length > 0
@@ -212,16 +177,11 @@ async function checkAdmin(){
       : "none";
 
   }catch(e){
-
-    document.getElementById("adminSyncBtn").style.display =
-    "none";
-
+    document.getElementById("adminSyncBtn").style.display = "none";
   }
-
 }
 
 function connectStrava(){
-
   const url =
     "https://www.strava.com/oauth/authorize" +
     "?client_id=" + STRAVA_CLIENT_ID +
@@ -231,13 +191,10 @@ function connectStrava(){
     "&scope=read,activity:read_all";
 
   window.location.href = url;
-
 }
 
 async function importFromStrava(code){
-
-  const response =
-  await fetch(
+  const response = await fetch(
     FUNCTION_URL,
     {
       method:"POST",
@@ -250,32 +207,24 @@ async function importFromStrava(code){
     }
   );
 
-  const data =
-  await response.json();
+  const data = await response.json();
 
   if(!data.ok){
     throw new Error(JSON.stringify(data));
   }
 
   return data;
-
 }
 
 async function syncStrava(){
-
-  const btn =
-  document.getElementById("adminSyncBtn");
+  const btn = document.getElementById("adminSyncBtn");
 
   btn.disabled = true;
   btn.innerText = "⏳ Sincronizando";
-
-  document.getElementById("status").innerText =
-  "Sincronizando Strava...";
+  document.getElementById("status").innerText = "Sincronizando Strava...";
 
   try{
-
-    const response =
-    await fetch(
+    const response = await fetch(
       SUPABASE_URL + "/functions/v1/admin-sync-strava",
       {
         method:"POST",
@@ -286,83 +235,65 @@ async function syncStrava(){
       }
     );
 
-    const data =
-    await response.json();
+    const data = await response.json();
 
     if(!data.ok){
       throw new Error(JSON.stringify(data));
     }
 
     document.getElementById("status").innerText =
-      "✅ Strava actualizado · " +
-      data.synced +
-      " participantes";
+      "✅ Strava actualizado · " + data.synced + " participantes";
 
     await loadSeasons();
     await loadDashboard();
 
   }catch(error){
-
     document.getElementById("status").innerText =
-    "❌ " + error.message;
-
+      "❌ " + error.message;
   }
 
   btn.disabled = false;
   btn.innerText = "👑 Actualizar Strava";
-
 }
 
 function titulo(pos){
-
   if(pos === 1) return "🥇 Gran Jabalí";
   if(pos === 2) return "🥈 Colmillo de Plata";
   if(pos === 3) return "🥉 Pezuña de Hierro";
-
   return "#" + pos;
-
 }
 
 function color(pos){
-
   if(pos === 1) return "gold";
   if(pos === 2) return "silver";
   if(pos === 3) return "bronze";
-
   return "";
-
 }
 
 async function loadDashboard(){
-
-  const status =
-  document.getElementById("status");
+  const status = document.getElementById("status");
 
   try{
-
     status.innerText = "Leyendo ranking...";
 
-    const ranking =
-    await readPath(
+    const ranking = await readPath(
       "/rest/v1/leaderboard_by_season?season=eq." +
       selectedSeason +
       "&select=*"
     );
 
     if(ranking.length > 0){
-
       const leader = ranking[0];
-      const leaderName =
-      leader.profile_name || "Jabalí";
+      const leaderName = leader.profile_name || "Jabalí";
 
       document.getElementById("kingAvatar").innerText =
-      leaderName.charAt(0).toUpperCase();
+        leaderName.charAt(0).toUpperCase();
 
       document.getElementById("kingName").innerText =
-      leaderName;
+        leaderName;
 
       document.getElementById("kingPoints").innerText =
-      Math.round(leader.total_points || 0) + " pts";
+        Math.round(leader.total_points || 0) + " pts";
 
       document.getElementById("kingStats").innerText =
         (leader.activities || 0) + " salidas · " +
@@ -370,22 +301,21 @@ async function loadDashboard(){
         Math.round(leader.total_elevation || 0) + " m+";
 
       document.getElementById("points").innerText =
-      Math.round(leader.total_points || 0);
+        Math.round(leader.total_points || 0);
 
       document.getElementById("activities").innerText =
-      leader.activities || 0;
+        leader.activities || 0;
 
       document.getElementById("km").innerText =
-      Math.round(leader.total_km || 0);
+        Math.round(leader.total_km || 0);
 
       document.getElementById("elevation").innerText =
-      Math.round(leader.total_elevation || 0);
+        Math.round(leader.total_elevation || 0);
 
       let list = "";
       let podium = "";
 
       ranking.forEach((r)=>{
-
         list +=
           "<div class='row'>" +
           "<div><strong class='" + color(r.position) + "'>" +
@@ -400,7 +330,6 @@ async function loadDashboard(){
           "</div>";
 
         if(r.position <= 3){
-
           podium +=
             "<div class='row'>" +
             "<div><strong class='" + color(r.position) + "'>" +
@@ -413,24 +342,16 @@ async function loadDashboard(){
             Math.round(r.total_points || 0) +
             " pts</div>" +
             "</div>";
-
         }
-
       });
 
-      document.getElementById("rankingList").innerHTML =
-      list;
-
-      document.getElementById("podium").innerHTML =
-      podium;
-
+      document.getElementById("rankingList").innerHTML = list;
+      document.getElementById("podium").innerHTML = podium;
     }
 
-    status.innerText =
-    "Leyendo actividades...";
+    status.innerText = "Leyendo actividades...";
 
-    const recent =
-    await readPath(
+    const recent = await readPath(
       "/rest/v1/recent_activities?select=*&activity_date=gte." +
       selectedSeason +
       "-01-01&activity_date=lt." +
@@ -441,7 +362,6 @@ async function loadDashboard(){
     let activities = "";
 
     recent.forEach((a)=>{
-
       activities +=
         "<div class='row'>" +
         "<div><strong>" +
@@ -456,64 +376,57 @@ async function loadDashboard(){
         (a.points || 0) +
         "</div>" +
         "</div>";
-
     });
 
     document.getElementById("recent").innerHTML =
-    activities || "Sin actividades";
+      activities || "Sin actividades";
 
-    const notifications =
-    await readPath(
-      "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
-    );
+    status.innerText = "Leyendo movimientos...";
+
+    let notifications = [];
+
+    try{
+      notifications = await readPath(
+        "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+      );
+    }catch(e){
+      notifications = [];
+    }
 
     let notificationsHtml = "";
 
     notifications.forEach((n)=>{
-
       notificationsHtml +=
         "<div class='row'>" +
         "<div>" +
-        (n.message || "") +
+        (n.message || "Movimiento detectado") +
         "</div>" +
         "</div>";
-
     });
 
     document.getElementById("notifications").innerHTML =
       notificationsHtml || "Sin movimientos";
 
-    status.innerText =
-    "🟢 Dashboard cargado";
+    status.innerText = "🟢 Dashboard cargado";
 
   }catch(error){
-
     status.innerText =
-    "❌ " + error.message;
-
+      "❌ " + error.message;
   }
-
 }
 
 async function start(){
-
   await checkAdmin();
 
-  const params =
-  new URLSearchParams(window.location.search);
-
-  const code =
-  params.get("code");
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get("code");
 
   if(code){
-
     try{
-
       document.getElementById("status").innerText =
-      "Importando desde Strava...";
+        "Importando desde Strava...";
 
-      const result =
-      await importFromStrava(code);
+      const result = await importFromStrava(code);
 
       document.getElementById("status").innerText =
         "✅ Participante añadido: " +
@@ -529,21 +442,16 @@ async function start(){
       );
 
     }catch(error){
-
       document.getElementById("status").innerText =
-      "❌ " + error.message;
-
+        "❌ " + error.message;
     }
-
   }
 
   await loadSeasons();
   await loadDashboard();
-
 }
 
 start();
-
 </script>
 
 </body>
