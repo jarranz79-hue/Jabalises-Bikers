@@ -123,14 +123,7 @@ async function importFromStrava(code){
 }
 
 async function checkAdmin(){
-  try{
-    const rows = await read("/rest/v1/profiles?select=role&role=eq.admin&limit=1");
-
-    document.getElementById("adminSyncBtn").style.display =
-      rows.length > 0 ? "inline-block" : "none";
-  }catch(e){
-    document.getElementById("adminSyncBtn").style.display = "none";
-  }
+  document.getElementById("adminSyncBtn").style.display = "inline-block";
 }
 
 async function syncStrava(){
