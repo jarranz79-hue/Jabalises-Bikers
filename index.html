@@ -123,7 +123,32 @@ async function importFromStrava(code){
 }
 
 async function checkAdmin(){
-  document.getElementById("adminSyncBtn").style.display = "inline-block";
+
+  try{
+
+    const rows =
+    await read(
+      "/rest/v1/admin_status?select=is_admin"
+    );
+
+    document.getElementById(
+      "adminSyncBtn"
+    ).style.display =
+
+      rows.length > 0 &&
+      rows[0].is_admin === true
+
+      ? "inline-block"
+      : "none";
+
+  }catch(e){
+
+    document.getElementById(
+      "adminSyncBtn"
+    ).style.display = "none";
+
+  }
+
 }
 
 async function syncStrava(){
