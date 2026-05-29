@@ -316,7 +316,7 @@ async function loadDashboard(){
 
 try {
   notifications = await read(
-    "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+    "/rest/v1/recent_notifications?select=*&limit=8"
   );
 } catch(e) {
   console.log("No se pudieron cargar movimientos", e);
