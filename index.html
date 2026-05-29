@@ -312,9 +312,16 @@ async function loadDashboard(){
     document.getElementById("activities").innerHTML =
       activitiesHtml || "Sin actividades";
 
-  const notifications = await read(
-  "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
-);
+ let notifications = [];
+
+try {
+  notifications = await read(
+    "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+  );
+} catch(e) {
+  console.log("No se pudieron cargar movimientos", e);
+  notifications = [];
+}
 
 let movementsHtml = "";
 
