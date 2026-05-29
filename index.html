@@ -312,6 +312,21 @@ async function loadDashboard(){
     document.getElementById("activities").innerHTML =
       activitiesHtml || "Sin actividades";
 
+  const notifications = await read(
+  "/rest/v1/notifications?select=*&order=created_at.desc&limit=8"
+);
+
+let movementsHtml = "";
+
+notifications.forEach((n)=>{
+  movementsHtml +=
+    "<div class='row'>" +
+    "<div>" + (n.message || "Movimiento detectado") + "</div>" +
+    "</div>";
+});
+
+document.getElementById("movements").innerHTML =
+  movementsHtml || "Sin movimientos todavía";
     document.getElementById("status").innerText = "🟢 Dashboard cargado";
   }catch(error){
     document.getElementById("status").innerText = "❌ " + error.message;
