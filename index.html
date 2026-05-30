@@ -25,6 +25,7 @@ select{background:#111827;border:1px solid #f97316}
 .avatar{width:72px;height:72px;border-radius:50%;margin:auto auto 12px auto;background:linear-gradient(135deg,#f97316,#facc15);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;color:#111827}
 .first .avatar{width:92px;height:92px;font-size:42px}
 .points{font-size:38px;font-weight:bold}
+.movements{font-size:16px;line-height:1.5;}
 @media(max-width:900px){.podium{grid-template-columns:1fr}}
 </style>
 </head>
@@ -326,10 +327,31 @@ try {
 let movementsHtml = "";
 
 notifications.forEach((n)=>{
+
+  const date = new Date(n.created_at);
+
   movementsHtml +=
-    "<div class='row'>" +
-    "<div>" + (n.message || "Movimiento detectado") + "</div>" +
+
+    "<div style='padding:14px 0;border-bottom:1px solid #1f2937'>" +
+
+      "<div style='font-size:18px'>" +
+
+      (n.message || "Movimiento detectado") +
+
+      "</div>" +
+
+      "<div class='small' style='margin-top:6px'>" +
+
+      (n.profile_name || "Jabalí") +
+
+      " · " +
+
+      date.toLocaleDateString("es-ES") +
+
+      "</div>" +
+
     "</div>";
+
 });
 
 document.getElementById("movements").innerHTML =
