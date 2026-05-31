@@ -26,6 +26,8 @@ select{background:#111827;border:1px solid #f97316}
 .first .avatar{width:92px;height:92px;font-size:42px}
 .points{font-size:38px;font-weight:bold}
 #movements{font-size:16px;line-height:1.5}
+.hidden{display:none}
+.more-btn{margin-top:12px;width:100%;background:#1f2937;color:white;border:1px solid #374151}
 @media(max-width:900px){.podium{grid-template-columns:1fr}}
 </style>
 </head>
@@ -244,6 +246,23 @@ function changeSeason(){
   loadDashboard();
 }
 
+function toggleMovements(){
+  const extra = document.getElementById("movementsExtra");
+  const btn = document.getElementById("movementsBtn");
+
+  if(!extra || !btn) return;
+
+  const hidden = extra.classList.contains("hidden");
+
+  if(hidden){
+    extra.classList.remove("hidden");
+    btn.innerText = "Ocultar movimientos";
+  }else{
+    extra.classList.add("hidden");
+    btn.innerText = "Ver 10 movimientos más";
+  }
+}
+
 async function loadDashboard(){
   try{
     document.getElementById("status").innerText = "Leyendo ranking...";
@@ -288,7 +307,7 @@ async function loadDashboard(){
 
     try{
       activities = await read(
-       "/rest/v1/recent_dashboard_activities?select=*&limit=12"
+        "/rest/v1/recent_dashboard_activities?select=*&limit=12"
       );
     }catch(e){
       console.log("No se pudieron cargar actividades", e);
@@ -315,19 +334,20 @@ async function loadDashboard(){
 
     try{
       notifications = await read(
-        "/rest/v1/recent_notifications?select=*&limit=10"
+        "/rest/v1/recent_notifications?select=*&limit=13"
       );
     }catch(e){
       console.log("No se pudieron cargar movimientos", e);
       notifications = [];
     }
 
-    let movementsHtml = "";
+    let previewHtml = "";
+    let extraHtml = "";
 
-    notifications.forEach((n)=>{
+    notifications.forEach((n,index)=>{
       const date = new Date(n.created_at);
 
-      movementsHtml +=
+      const item =
         "<div style='padding:14px 0;border-bottom:1px solid #1f2937'>" +
         "<div style='font-size:18px'>" +
         (n.message || "Movimiento detectado") +
@@ -338,10 +358,26 @@ async function loadDashboard(){
         date.toLocaleDateString("es-ES") +
         "</div>" +
         "</div>";
+
+      if(index < 3){
+        previewHtml += item;
+      }else if(index < 13){
+        extraHtml += item;
+      }
     });
 
     document.getElementById("movements").innerHTML =
-      movementsHtml || "Sin movimientos todavía";
+      previewHtml
+      ? previewHtml +
+        (extraHtml
+          ? "<div id='movementsExtra' class='hidden'>" +
+              extraHtml +
+            "</div>" +
+            "<button id='movementsBtn' class='more-btn' onclick='toggleMovements()'>" +
+            "Ver 10 movimientos más" +
+            "</button>"
+          : "")
+      : "Sin movimientos todavía";
 
     document.getElementById("status").innerText = "🟢 Dashboard cargado";
   }catch(error){
