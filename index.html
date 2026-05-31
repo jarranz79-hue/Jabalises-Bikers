@@ -288,7 +288,7 @@ async function loadDashboard(){
 
     try{
       activities = await read(
-        "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
+       "/rest/v1/recent_dashboard_activities?select=*&limit=12"
       );
     }catch(e){
       console.log("No se pudieron cargar actividades", e);
