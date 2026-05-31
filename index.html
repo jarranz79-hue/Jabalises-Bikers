@@ -25,7 +25,7 @@ select{background:#111827;border:1px solid #f97316}
 .avatar{width:72px;height:72px;border-radius:50%;margin:auto auto 12px auto;background:linear-gradient(135deg,#f97316,#facc15);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;color:#111827}
 .first .avatar{width:92px;height:92px;font-size:42px}
 .points{font-size:38px;font-weight:bold}
-.movements{font-size:16px;line-height:1.5;}
+#movements{font-size:16px;line-height:1.5}
 @media(max-width:900px){.podium{grid-template-columns:1fr}}
 </style>
 </head>
@@ -124,32 +124,16 @@ async function importFromStrava(code){
 }
 
 async function checkAdmin(){
-
   try{
+    const rows = await read("/rest/v1/admin_status?select=is_admin");
 
-    const rows =
-    await read(
-      "/rest/v1/admin_status?select=is_admin"
-    );
-
-    document.getElementById(
-      "adminSyncBtn"
-    ).style.display =
-
-      rows.length > 0 &&
-      rows[0].is_admin === true
-
+    document.getElementById("adminSyncBtn").style.display =
+      rows.length > 0 && rows[0].is_admin === true
       ? "inline-block"
       : "none";
-
   }catch(e){
-
-    document.getElementById(
-      "adminSyncBtn"
-    ).style.display = "none";
-
+    document.getElementById("adminSyncBtn").style.display = "none";
   }
-
 }
 
 async function syncStrava(){
@@ -178,12 +162,17 @@ async function syncStrava(){
     }
 
     document.getElementById("status").innerText =
-      "✅ Strava actualizado · " + data.synced + " participantes · " + data.imported + " actividades";
+      "✅ Strava actualizado · " +
+      data.synced +
+      " participantes · " +
+      data.imported +
+      " actividades";
 
     await loadSeasons();
     await loadDashboard();
   }catch(error){
-    document.getElementById("status").innerText = "❌ " + error.message;
+    document.getElementById("status").innerText =
+      "❌ " + error.message;
   }
 
   btn.disabled = false;
@@ -295,22 +284,19 @@ async function loadDashboard(){
 
     document.getElementById("status").innerText = "Leyendo actividades...";
 
-    const activities = await read(
-      "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
-    );
+    let activities = [];
 
-  let activities = [];
+    try{
+      activities = await read(
+        "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
+      );
+    }catch(e){
+      console.log("No se pudieron cargar actividades", e);
+      activities = [];
+    }
 
-try{
-  activities = await read(
-    "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
-  );
-}catch(e){
-  console.log("No se pudieron cargar actividades", e);
-  activities = [];
-}
+    let activitiesHtml = "";
 
-let activitiesHtml = "";
     activities.forEach((a)=>{
       activitiesHtml +=
         "<div class='row'>" +
@@ -322,54 +308,45 @@ let activitiesHtml = "";
 
     document.getElementById("activities").innerHTML =
       activitiesHtml || "Sin actividades";
-    console.log("ACTIVITIES", activities.length);
 
- let notifications = [];
+    document.getElementById("status").innerText = "Leyendo movimientos...";
 
-try {
-  notifications = await read(
-    "/rest/v1/recent_notifications?select=*&limit=10"
-  );
-} catch(e) {
-  console.log("No se pudieron cargar movimientos", e);
-  notifications = [];
-}
+    let notifications = [];
 
-let movementsHtml = "";
+    try{
+      notifications = await read(
+        "/rest/v1/recent_notifications?select=*&limit=10"
+      );
+    }catch(e){
+      console.log("No se pudieron cargar movimientos", e);
+      notifications = [];
+    }
 
-notifications.forEach((n)=>{
+    let movementsHtml = "";
 
-  const date = new Date(n.created_at);
+    notifications.forEach((n)=>{
+      const date = new Date(n.created_at);
 
-  movementsHtml +=
+      movementsHtml +=
+        "<div style='padding:14px 0;border-bottom:1px solid #1f2937'>" +
+        "<div style='font-size:18px'>" +
+        (n.message || "Movimiento detectado") +
+        "</div>" +
+        "<div class='small' style='margin-top:6px'>" +
+        (n.profile_name || "Jabalí") +
+        " · " +
+        date.toLocaleDateString("es-ES") +
+        "</div>" +
+        "</div>";
+    });
 
-    "<div style='padding:14px 0;border-bottom:1px solid #1f2937'>" +
+    document.getElementById("movements").innerHTML =
+      movementsHtml || "Sin movimientos todavía";
 
-      "<div style='font-size:18px'>" +
-
-      (n.message || "Movimiento detectado") +
-
-      "</div>" +
-
-      "<div class='small' style='margin-top:6px'>" +
-
-      (n.profile_name || "Jabalí") +
-
-      " · " +
-
-      date.toLocaleDateString("es-ES") +
-
-      "</div>" +
-
-    "</div>";
-
-});
-
-document.getElementById("movements").innerHTML =
-  movementsHtml || "Sin movimientos todavía";
     document.getElementById("status").innerText = "🟢 Dashboard cargado";
   }catch(error){
-    document.getElementById("status").innerText = "❌ " + error.message;
+    document.getElementById("status").innerText =
+      "❌ " + error.message;
   }
 }
 
@@ -391,7 +368,8 @@ async function start(){
 
       window.history.replaceState({}, document.title, REDIRECT_URL);
     }catch(error){
-      document.getElementById("status").innerText = "❌ " + error.message;
+      document.getElementById("status").innerText =
+        "❌ " + error.message;
       return;
     }
   }
