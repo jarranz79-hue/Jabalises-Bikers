@@ -299,7 +299,7 @@ async function loadDashboard(){
       "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
     );
 
-   let activities = [];
+  let activities = [];
 
 try{
   activities = await read(
@@ -309,6 +309,8 @@ try{
   console.log("No se pudieron cargar actividades", e);
   activities = [];
 }
+
+let activitiesHtml = "";
     activities.forEach((a)=>{
       activitiesHtml +=
         "<div class='row'>" +
