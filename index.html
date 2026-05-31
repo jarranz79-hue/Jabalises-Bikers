@@ -263,6 +263,23 @@ function toggleMovements(){
   }
 }
 
+function toggleActivities(){
+  const extra = document.getElementById("activitiesExtra");
+  const btn = document.getElementById("activitiesBtn");
+
+  if(!extra || !btn) return;
+
+  const hidden = extra.classList.contains("hidden");
+
+  if(hidden){
+    extra.classList.remove("hidden");
+    btn.innerText = "Ocultar actividades";
+  }else{
+    extra.classList.add("hidden");
+    btn.innerText = "Ver 10 actividades más";
+  }
+}
+
 async function loadDashboard(){
   try{
     document.getElementById("status").innerText = "Leyendo ranking...";
@@ -307,26 +324,43 @@ async function loadDashboard(){
 
     try{
       activities = await read(
-        "/rest/v1/recent_dashboard_activities?select=*&limit=12"
+        "/rest/v1/recent_dashboard_activities?select=*&limit=13"
       );
     }catch(e){
       console.log("No se pudieron cargar actividades", e);
       activities = [];
     }
 
-    let activitiesHtml = "";
+    let activitiesPreviewHtml = "";
+    let activitiesExtraHtml = "";
 
-    activities.forEach((a)=>{
-      activitiesHtml +=
+    activities.forEach((a,index)=>{
+      const item =
         "<div class='row'>" +
         "<div><strong>" + (a.name || "Actividad") + "</strong><br>" +
         "<span class='small'>" + (a.distance_km || 0) + " km · " + (a.elevation_m || 0) + " m+</span></div>" +
         "<div class='green'>🏆 " + (a.points || 0) + "</div>" +
         "</div>";
+
+      if(index < 3){
+        activitiesPreviewHtml += item;
+      }else if(index < 13){
+        activitiesExtraHtml += item;
+      }
     });
 
     document.getElementById("activities").innerHTML =
-      activitiesHtml || "Sin actividades";
+      activitiesPreviewHtml
+      ? activitiesPreviewHtml +
+        (activitiesExtraHtml
+          ? "<div id='activitiesExtra' class='hidden'>" +
+              activitiesExtraHtml +
+            "</div>" +
+            "<button id='activitiesBtn' class='more-btn' onclick='toggleActivities()'>" +
+            "Ver 10 actividades más" +
+            "</button>"
+          : "")
+      : "Sin actividades";
 
     document.getElementById("status").innerText = "Leyendo movimientos...";
 
