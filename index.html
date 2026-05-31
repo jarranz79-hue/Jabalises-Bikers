@@ -22,7 +22,7 @@ select{background:#111827;border:1px solid #f97316}
 .podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:14px;align-items:end}
 .podium-card{background:#0b1224;border:1px solid #1f2937;border-radius:24px;padding:20px;text-align:center}
 .first{border:2px solid #facc15;transform:scale(1.04)}
-.avatar{width:72px;height:72px;border-radius:50%;margin:auto auto 12px auto;background:linear-gradient(135deg,#f97316,#facc15);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;color:#111827}
+.avatar{width:72px;height:72px;border-radius:50%;margin:auto auto 12px auto;background:linear-gradient(135deg,#f97316,#facc15);display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:bold;color:#111827;object-fit:cover}
 .first .avatar{width:92px;height:92px;font-size:42px}
 .points{font-size:38px;font-weight:bold}
 #movements{font-size:16px;line-height:1.5}
@@ -80,7 +80,6 @@ const FUNCTION_URL =
 
 const STRAVA_CLIENT_ID =
 "250583";
-
 const REDIRECT_URL = "https://jarranz79-hue.github.io/Jabalises-Bikers/";
 let selectedSeason = new Date().getFullYear();
 
@@ -199,15 +198,27 @@ function avatar(name){
   return (name || "J").charAt(0).toUpperCase();
 }
 
-function podiumCard(r){
+function podiumCard(r, leaderPoints){
   const first = r.position===1 ? "first" : "";
+  const points = Number(r.total_points || 0);
+
+  const gap =
+    r.position === 1
+    ? "👑 Líder"
+    : "-" + Math.max(0, leaderPoints - points) + " pts del líder";
+
+  const avatarHtml =
+    r.avatar_url
+    ? `<img src="${r.avatar_url}" class="avatar">`
+    : `<div class="avatar">${avatar(r.display_name)}</div>`;
 
   return `
     <div class="podium-card ${first}">
       <div class="${colorFor(r.position)}"><strong>${titleFor(r.position)}</strong></div>
-      <div class="avatar">${avatar(r.display_name)}</div>
+      ${avatarHtml}
       <h2>${r.display_name}</h2>
-      <div class="points ${colorFor(r.position)}">${r.total_points}</div>
+      <div class="points ${colorFor(r.position)}">${points}</div>
+      <div class="small">${gap}</div>
       <div class="small">${r.activities} salidas</div>
       <div class="small">${r.total_km} km · ${r.total_elevation} m+</div>
     </div>
@@ -294,10 +305,15 @@ async function loadDashboard(){
     const first = ranking.find(r=>r.position===1);
     const third = ranking.find(r=>r.position===3);
 
+    const leaderPoints =
+      first
+      ? Number(first.total_points || 0)
+      : 0;
+
     let podiumHtml = "";
-    if(second) podiumHtml += podiumCard(second);
-    if(first) podiumHtml += podiumCard(first);
-    if(third) podiumHtml += podiumCard(third);
+    if(second) podiumHtml += podiumCard(second, leaderPoints);
+    if(first) podiumHtml += podiumCard(first, leaderPoints);
+    if(third) podiumHtml += podiumCard(third, leaderPoints);
 
     document.getElementById("podium").innerHTML =
       podiumHtml || "Sin podio";
@@ -307,11 +323,14 @@ async function loadDashboard(){
     let rankingHtml = "";
 
     rest.forEach((r)=>{
+      const diff = leaderPoints - Number(r.total_points || 0);
+
       rankingHtml +=
         "<div class='row'>" +
         "<div><strong>#" + r.position + "</strong><br>" +
         "<span class='small'>" + r.display_name + "</span></div>" +
-        "<div class='green'>" + r.total_points + " pts</div>" +
+        "<div><span class='green'>" + r.total_points + " pts</span><br>" +
+        "<span class='small'>-" + diff + " pts</span></div>" +
         "</div>";
     });
 
