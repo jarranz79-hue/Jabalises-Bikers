@@ -299,8 +299,16 @@ async function loadDashboard(){
       "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
     );
 
-    let activitiesHtml = "";
+   let activities = [];
 
+try{
+  activities = await read(
+    "/rest/v1/activities?select=*&order=activity_date.desc&limit=12"
+  );
+}catch(e){
+  console.log("No se pudieron cargar actividades", e);
+  activities = [];
+}
     activities.forEach((a)=>{
       activitiesHtml +=
         "<div class='row'>" +
@@ -312,6 +320,7 @@ async function loadDashboard(){
 
     document.getElementById("activities").innerHTML =
       activitiesHtml || "Sin actividades";
+    console.log("ACTIVITIES", activities.length);
 
  let notifications = [];
 
