@@ -330,22 +330,12 @@ function toggleActivities(){
 }
 async function openProfileModal(profileId){
 
-  alert("Abriendo perfil: " + profileId);
-
 const rows = await read(
   "/rest/v1/competitor_profiles?profile_id=eq." +
   profileId +
   "&season=eq." +
   selectedSeason
 );
-
-alert(
-  "Perfil: " + profileId +
-  "\nTemporada: " + selectedSeason +
-  "\nFilas: " + rows.length
-);
-
-  alert(JSON.stringify(rows));
 
   if(!rows.length){
     return;
