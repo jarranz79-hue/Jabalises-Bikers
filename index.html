@@ -29,6 +29,29 @@ select{background:#111827;border:1px solid #f97316}
 .hidden{display:none}
 .more-btn{margin-top:12px;width:100%;background:#1f2937;color:white;border:1px solid #374151}
 @media(max-width:900px){.podium{grid-template-columns:1fr}}
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.7);
+display:flex;
+align-items:center;
+justify-content:center;
+z-index:999;
+padding:20px;
+}
+
+.modal-content{
+background:#111827;
+border:1px solid #374151;
+border-radius:24px;
+padding:24px;
+max-width:520px;
+width:100%;
+}
+
+.clickable{
+cursor:pointer;
+}
 </style>
 </head>
 
@@ -289,6 +312,53 @@ function toggleActivities(){
     extra.classList.add("hidden");
     btn.innerText = "Ver 10 actividades más";
   }
+}
+async function openProfileModal(profileId){
+  const rows = await read(
+    "/rest/v1/competitor_profiles?profile_id=eq." +
+    profileId +
+    "&season=eq." +
+    selectedSeason
+  );
+
+  if(!rows.length){
+    return;
+  }
+
+  const p = rows[0];
+
+  document.getElementById("profileTitle").innerText =
+    "👤 " + p.display_name;
+
+  document.getElementById("profileBody").innerHTML =
+    "<div class='row'><div>🏆 Puntos</div><div class='green'>" + p.total_points + "</div></div>" +
+    "<div class='row'><div>🚴 Actividades</div><div>" + p.total_activities + "</div></div>" +
+    "<div class='row'><div>📍 Km totales</div><div>" + p.total_km + " km</div></div>" +
+    "<div class='row'><div>⛰️ Desnivel total</div><div>" + p.total_elevation + " m+</div></div>" +
+
+    "<h3>🚵 MTB / Gravel</h3>" +
+    "<div class='row'><div>Salidas</div><div>" + p.mtb_activities + "</div></div>" +
+    "<div class='row'><div>Km</div><div>" + p.mtb_km + " km</div></div>" +
+    "<div class='row'><div>Desnivel</div><div>" + p.mtb_elevation + " m+</div></div>" +
+    "<div class='row'><div>Puntos</div><div class='green'>" + p.mtb_points + "</div></div>" +
+
+    "<h3>⚡ eBike</h3>" +
+    "<div class='row'><div>Salidas</div><div>" + p.ebike_activities + "</div></div>" +
+    "<div class='row'><div>Km</div><div>" + p.ebike_km + " km</div></div>" +
+    "<div class='row'><div>Desnivel</div><div>" + p.ebike_elevation + " m+</div></div>" +
+    "<div class='row'><div>Puntos</div><div class='green'>" + p.ebike_points + "</div></div>" +
+
+    "<h3>🚴 Carretera</h3>" +
+    "<div class='row'><div>Salidas</div><div>" + p.road_activities + "</div></div>" +
+    "<div class='row'><div>Km</div><div>" + p.road_km + " km</div></div>" +
+    "<div class='row'><div>Desnivel</div><div>" + p.road_elevation + " m+</div></div>" +
+    "<div class='row'><div>Puntos</div><div class='green'>" + p.road_points + "</div></div>";
+
+  document.getElementById("profileModal").classList.remove("hidden");
+}
+
+function closeProfileModal(){
+  document.getElementById("profileModal").classList.add("hidden");
 }
 
 async function loadDashboard(){
