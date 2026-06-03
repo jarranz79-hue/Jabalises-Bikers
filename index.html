@@ -91,7 +91,7 @@ cursor:pointer;
   <div id="activities">Cargando actividades...</div>
 </div>
 
-  <div id="profileModal" class="modal hidden">
+  <div id="profileModal" class="modal" style="display:none">
   <div class="modal-content">
     <h2 id="profileTitle">Perfil</h2>
     <div id="profileBody"></div>
@@ -373,13 +373,12 @@ alert(
     "<div class='row'><div>Desnivel</div><div>" + p.road_elevation + " m+</div></div>" +
     "<div class='row'><div>Puntos</div><div class='green'>" + p.road_points + "</div></div>";
 
-  document.getElementById("profileModal").classList.remove("hidden");
+  document.getElementById("profileModal").style.display = "flex";
 }
 
 function closeProfileModal(){
-  document.getElementById("profileModal").classList.add("hidden");
+  document.getElementById("profileModal").style.display = "none";
 }
-
 async function loadDashboard(){
   try{
     document.getElementById("status").innerText = "Leyendo ranking...";
