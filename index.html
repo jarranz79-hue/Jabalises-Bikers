@@ -322,6 +322,9 @@ function toggleActivities(){
   }
 }
 async function openProfileModal(profileId){
+
+  alert("Abriendo perfil: " + profileId);
+
   const rows = await read(
     "/rest/v1/competitor_profiles?profile_id=eq." +
     profileId +
